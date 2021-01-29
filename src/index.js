@@ -1,6 +1,4 @@
-
 import Phaser from 'phaser';
-
 // const height = window.innerHeight;
 
 const config = {
@@ -28,6 +26,7 @@ const game = new Phaser.Game(config);
 let cursors;
 let player;
 let showDebug = false;
+let gbj;
 
 //
   let score=0;
@@ -38,13 +37,14 @@ function preload() {
   this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
    // this.load.tilemapTiledJSON("map", "./assets/tilemaps/trial.json");
   // this.load.tilemapTiledJSON("map", "./assets/tilemaps/city3.json");
-  this.load.tilemapTiledJSON("map", "./assets/tilemaps/map6.json");
+  this.load.tilemapTiledJSON("map", "./assets/tilemaps/map7.json");
   // // An atlas is a way to pack multiple images together into one texture. I'm using it to load all
   // // the player animations (walking left, walking right, etc.) in one image. For more info see:
   // //  https://labs.phaser.io/view.html?src=src/animation/texture%20atlas%20animation.js
   // // If you don't use an atlas, you can do the same thing with a spritesheet, see:
   // //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
+  this.load.image("garbage", "./assets/images/garbage.png");
 }
 
 function create() {
@@ -74,7 +74,8 @@ function create() {
   // // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
    const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-
+  const garbagePoint = map.findObject("Objects", obj => obj.name === "Garbage");
+  console.log(garbagePoint);
   // // Create a sprite with physics enabled via the physics system. The image used for the sprite has
   // // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
   player = this.physics.add
@@ -82,9 +83,14 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
+    gbj = this.matter.add
+    .sprite(garbagePoint.x, garbagePoint.y, "garbage");
+
+    gbj.scaleX = 0.5;
+    gbj.scaleY = 0.5
   // // Watch the player and worldLayer for collisions, for the duration of the scene:
   this.physics.add.collider(player, worldLayer);
-
+  this.physics.add.collider(gbj, player);
   // // Create the player's walking animations from the texture atlas. These are stored in the global
   // // animation manager so any sprite can access them.
   const anims = this.anims;
