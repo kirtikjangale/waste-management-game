@@ -22,11 +22,10 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-
 let cursors;
 let player;
 let showDebug = false;
-let gbj;
+let garbage;
 
 //
   let score=0;
@@ -73,9 +72,9 @@ function create() {
 
   // // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
+
+  const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
   const garbagePoint = map.findObject("Objects", obj => obj.name === "Garbage");
-  console.log(garbagePoint);
   // // Create a sprite with physics enabled via the physics system. The image used for the sprite has
   // // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
   player = this.physics.add
@@ -83,14 +82,16 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
-    gbj = this.matter.add
-    .sprite(garbagePoint.x, garbagePoint.y, "garbage");
+  garbage = this.physics.add.sprite(garbagePoint.x, garbagePoint.y, "garbage")
+  garbage.scaleX = 0.3;
+  garbage.scaleY = 0.3;
 
-    gbj.scaleX = 0.5;
-    gbj.scaleY = 0.5
   // // Watch the player and worldLayer for collisions, for the duration of the scene:
-  this.physics.add.collider(player, worldLayer);
-  this.physics.add.collider(gbj, player);
+  this.physics.add.collider(player, worldLayer)
+  this.physics.add.collider(player, garbage, function (plane, garbage){
+    garbage.setImmovable(true);
+    console.log("player collided with garbage!");
+  })
   // // Create the player's walking animations from the texture atlas. These are stored in the global
   // // animation manager so any sprite can access them.
   const anims = this.anims;
@@ -182,7 +183,7 @@ function update(time, delta) {
 
   // Stop any previous movement from the last frame
   player.body.setVelocity(0);
-
+  garbage.body.setVelocity(0);
   // Horizontal movement
   if (cursors.left.isDown) {
     player.body.setVelocityX(-speed);
@@ -219,6 +220,6 @@ function update(time, delta) {
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
     score = score+0.1;
-    text.setText(`Score:${score}`);
+    // text.setText(`Score:${score}`);
   }
 }
