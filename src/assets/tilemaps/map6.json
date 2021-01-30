@@ -3,7 +3,8 @@
     {
      "export":
         {
-         "target":"."
+         "format":"json",
+         "target":"map6.json"
         }
     },
  "height":80,
@@ -73,9 +74,44 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"Waste",
+         "objects":[
+                {
+                 "ellipse":true,
+                 "height":0,
+                 "id":2,
+                 "name":"waste-2",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":588,
+                 "y":1789
+                }, 
+                {
+                 "ellipse":true,
+                 "height":32,
+                 "id":3,
+                 "name":"waste-1",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":32,
+                 "x":724,
+                 "y":1837
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":2,
+ "nextlayerid":7,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
@@ -84,7 +120,7 @@
         {
          "columns":25,
          "firstgid":1,
-         "image":"..\/tilesets\/tuxmon-sample-32px-extruded.png",
+         "image":"..\/..\/..\/..\/Phaser3-game\/src\/assets\/tilesets\/tuxmon-sample-32px-extruded.png",
          "imageheight":1020,
          "imagewidth":816,
          "margin":0,
