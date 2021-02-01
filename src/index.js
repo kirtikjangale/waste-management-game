@@ -28,6 +28,7 @@ let player;
 let showDebug = false;
 let garbage;
 let zone;
+let collider;
 
 //
   let score=0;
@@ -99,14 +100,20 @@ function create() {
   //   },
   //   add: true
   // });
-
-  zone = this.add.zone(garbagePoint.x, garbagePoint.y)
+  zone = this.add.zone(garbagePoint.x, garbagePoint.y, "garbage")
         .setSize(100, 100);
   // // Watch the player and worldLayer for collisions, for the duration of the scene:
   this.physics.world.enable(zone);
   zone.body.setAllowGravity(false);
   zone.body.moves = false;
   this.physics.add.collider(player, worldLayer);
+
+  collider = this.physics.add.overlap(player, zone, function (){
+    collider.active = false;
+    console.log("in here");
+    // hitGarbage(garbage);
+  }, null, this);
+
   // this.physics.add.collider(player, garbage, hitGarbage, null, this);
   // // Create the player's walking animations from the texture atlas. These are stored in the global
   // // animation manager so any sprite can access them.
@@ -182,6 +189,7 @@ function create() {
     });
   });
 
+
   text = this.add
   .text(16, 16, 'Arrow keys to move\nScore:0', {
     font: "18px monospace",
@@ -192,6 +200,8 @@ function create() {
   .setScrollFactor(0)
   .setDepth(30);
 }
+//show(garbage){
+//}
 
 function hitGarbage(garbage) {
   var dialog = this.rexUI.add.dialog({
@@ -294,6 +304,7 @@ function hitGarbage(garbage) {
         button.getElement('background').setStrokeStyle();
     });
   console.log("player collided with garbage!");
+  
 }
 
 var createLabel = function (scene, text) {
@@ -314,6 +325,15 @@ var createLabel = function (scene, text) {
           bottom: 10
       }
   });
+}
+
+function checkOverlap(spriteA, spriteB) {
+
+  var boundsA = spriteA.getBounds();
+  var boundsB = spriteB.getBounds();
+
+  return Phaser.Geom.Rectangle.Intersection(boundsA, boundsB);
+
 }
 
 function update(time, delta) {
@@ -358,7 +378,25 @@ function update(time, delta) {
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
     score = score+0.1;
-    zone.body.debugBodyColor = zone.body.touching.none ? 0x00ffff : 0xffff00;
+    var overlap = checkOverlap(player, zone);
+    if (!(overlap.width===0 && overlap.height===0))
+    {   
+        collider.active = false;
+        console.log('Drag the sprites. Overlapping: true');
+    }
+    else
+    {   collider.active = true;
+        console.log('Drag the sprites. Overlapping: false');
+    }
+    // console.log(zone.getBounds());
+    // console.log(player.getBounds());
+    // if(zone.body.touching.none){
+    //   console.log(zone.body.debugBodyColor);
+    //   zone.body.debugBodyColor = 0x00ffff;
+    // }else{
+    //   console.log(zone.body.debugBodyColor);
+    //   zone.body.debugBodyColor = 0xffff00;
+    // }
     // text.setText(`Score:${score}`);
   }
 }
