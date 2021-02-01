@@ -68,6 +68,17 @@
                  "width":0,
                  "x":530.028214264852,
                  "y":1960.86453647993
+                }, 
+                {
+                 "height":34.0557275541796,
+                 "id":2,
+                 "name":"Garbage",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":43.3436532507741,
+                 "x":712.074303405573,
+                 "y":1947.36842105263
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -110,8 +121,13 @@
          "x":0,
          "y":0
         }],
+<<<<<<< HEAD
  "nextlayerid":7,
  "nextobjectid":4,
+=======
+ "nextlayerid":6,
+ "nextobjectid":3,
+>>>>>>> 40c5811b2b0b6278317eeb41e856785bacfbc768
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
