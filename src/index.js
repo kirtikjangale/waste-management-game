@@ -10,6 +10,7 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
+      debug: true,
       gravity: { y: 0 }
     }
   },
@@ -26,6 +27,7 @@ let cursors;
 let player;
 let showDebug = false;
 let garbage;
+let zone;
 
 //
   let score=0;
@@ -44,6 +46,11 @@ function preload() {
   // //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
   this.load.image("garbage", "./assets/images/garbage.png");
+  this.load.scenePlugin({
+    key: 'rexuiplugin',
+    url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
+    sceneKey: 'rexUI'
+  });
 }
 
 function create() {
@@ -82,16 +89,25 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
-  garbage = this.physics.add.sprite(garbagePoint.x, garbagePoint.y, "garbage")
-  garbage.scaleX = 0.3;
-  garbage.scaleY = 0.3;
+  // garbage = this.make.image({
+  //   x: garbagePoint.x, 
+  //   y: garbagePoint.y, 
+  //   key: "garbage",
+  //   scale:{
+  //     x: 0.3,
+  //     y: 0.3
+  //   },
+  //   add: true
+  // });
 
+  zone = this.add.zone(garbagePoint.x, garbagePoint.y)
+        .setSize(100, 100);
   // // Watch the player and worldLayer for collisions, for the duration of the scene:
-  this.physics.add.collider(player, worldLayer)
-  this.physics.add.collider(player, garbage, function (plane, garbage){
-    garbage.setImmovable(true);
-    console.log("player collided with garbage!");
-  })
+  this.physics.world.enable(zone);
+  zone.body.setAllowGravity(false);
+  zone.body.moves = false;
+  this.physics.add.collider(player, worldLayer);
+  // this.physics.add.collider(player, garbage, hitGarbage, null, this);
   // // Create the player's walking animations from the texture atlas. These are stored in the global
   // // animation manager so any sprite can access them.
   const anims = this.anims;
@@ -177,13 +193,135 @@ function create() {
   .setDepth(30);
 }
 
+function hitGarbage(garbage) {
+  var dialog = this.rexUI.add.dialog({
+    x: garbage.x,
+    y: garbage.y,
+    width: 500,
+
+    background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
+
+    title: createLabel(this, 'Title').setDraggable(),
+
+    toolbar: [
+        createLabel(this, 'O'),
+        createLabel(this, 'X')
+    ],
+
+    leftToolbar: [
+        createLabel(this, 'A'),
+        createLabel(this, 'B')
+    ],  
+
+    content: createLabel(this, 'Content'),
+
+    description: createLabel(this, 'Description'),
+
+    choices: [
+        createLabel(this, 'Choice0'),
+        createLabel(this, 'Choice1'),
+        createLabel(this, 'Choice2')
+    ],
+
+    actions: [
+        createLabel(this, 'Action0'),
+        createLabel(this, 'Action1')
+    ],
+
+    space: {
+        left: 20,
+        right: 20,
+        top: -20,
+        bottom: -20,
+
+        title: 25,
+        titleLeft: 30,
+        content: 25,
+        description: 25,
+        descriptionLeft: 20,
+        descriptionRight: 20,
+        choices: 25,
+
+        toolbarItem: 5,
+        choice: 15,
+        action: 15,
+    },
+
+    expand: {
+        title: false,
+        // content: false,
+        // description: false,
+        // choices: false,
+        // actions: true,
+    },
+
+    align: {
+        title: 'center',
+        // content: 'left',
+        // description: 'left',
+        // choices: 'left',
+        actions: 'right', // 'center'|'left'|'right'
+    },
+
+    click: {
+        mode: 'release'
+    }
+  })
+  .setDraggable('background')   // Draggable-background
+  .layout()
+// .drawBounds(this.add.graphics(), 0xff0000)
+  .popUp(1000);
+
+  var tween = this.tweens.add({
+    targets: dialog,
+    scaleX: 1,
+    scaleY: 1,
+    ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
+    duration: 1000,
+    repeat: 0, // -1: infinity
+    yoyo: false
+});
+
+  this.print = this.add.text(0, 0, '');
+  dialog
+    .on('button.click', function (button, groupName, index, pointer, event) {
+        this.print.text += groupName + '-' + index + ': ' + button.text + '\n';
+    }, this)
+    .on('button.over', function (button, groupName, index, pointer, event) {
+        button.getElement('background').setStrokeStyle(1, 0xffffff);
+    })
+    .on('button.out', function (button, groupName, index, pointer, event) {
+        button.getElement('background').setStrokeStyle();
+    });
+  console.log("player collided with garbage!");
+}
+
+var createLabel = function (scene, text) {
+  return scene.rexUI.add.label({
+      width: 40, // Minimum width of round-rectangle
+      height: 40, // Minimum height of round-rectangle
+    
+      background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x5e92f3),
+
+      text: scene.add.text(0, 0, text, {
+          fontSize: '24px'
+      }),
+
+      space: {
+          left: 10,
+          right: 10,
+          top: 10,
+          bottom: 10
+      }
+  });
+}
+
 function update(time, delta) {
   const speed = 500;
   const prevVelocity = player.body.velocity.clone();
 
   // Stop any previous movement from the last frame
   player.body.setVelocity(0);
-  garbage.body.setVelocity(0);
   // Horizontal movement
   if (cursors.left.isDown) {
     player.body.setVelocityX(-speed);
@@ -220,6 +358,7 @@ function update(time, delta) {
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
     score = score+0.1;
+    zone.body.debugBodyColor = zone.body.touching.none ? 0x00ffff : 0xffff00;
     // text.setText(`Score:${score}`);
   }
 }
