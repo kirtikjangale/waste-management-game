@@ -28,7 +28,7 @@ class GameScene extends Phaser.Scene {
         this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
       
         this.load.image("waste", "../assets/images/balls.png");
-        this.load.image("boxback", "../assets/images/boxback.png");
+
         this.load.scenePlugin({
           key: 'rexuiplugin',
           url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
@@ -265,70 +265,26 @@ class GameScene extends Phaser.Scene {
     
               background: scene.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0xf57f17).setScrollFactor(0).setDepth(30),
     
-              // background : scene.add.image(0,0,'waste').setScrollFactor(0).setDepth(30),
-              title: 
-              
-                        scene.rexUI.add.label({
-                          background: scene.add.image(0,0,'waste').setScrollFactor(0).setDepth(30).setScale(1,5),
-                          // text: scene.add.text(0, 0, 'Pick a category', {
-                          //     fontSize: '20px'
-                          // }),
-                          space: {
-                              left: 15,
-                              right: 15,
-                              top: 10,
-                              bottom: 10
-                          }
-                        }),
-                    
-                  
-
-              
+              title: scene.rexUI.add.label({
+                  background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
+                  text: scene.add.text(0, 0, 'Pick a color', {
+                      fontSize: '20px'
+                  }),
+                  space: {
+                      left: 15,
+                      right: 15,
+                      top: 10,
+                      bottom: 10
+                  }
+              }),
     
               actions: [
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0xe91e63).setScrollFactor(0).setDepth(30),
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x673ab7).setScrollFactor(0).setDepth(30),
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x2196f3).setScrollFactor(0).setDepth(30),
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x00bcd4).setScrollFactor(0).setDepth(30),
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x4caf50).setScrollFactor(0).setDepth(30),
-                  // scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0xcddc39).setScrollFactor(0).setDepth(30),
-                  scene.rexUI.add.label({
-                    background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
-                    text: scene.add.text(0, 0, 'Plastic', {
-                        fontSize: '20px'
-                    }),
-                    space: {
-                        left: 15,
-                        right: 15,
-                        top: 10,
-                        bottom: 10
-                    }
-                  }),
-                  scene.rexUI.add.label({
-                    background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
-                    text: scene.add.text(0, 0, 'Organic', {
-                        fontSize: '20px'
-                    }),
-                    space: {
-                        left: 15,
-                        right: 15,
-                        top: 10,
-                        bottom: 10
-                    }
-                  }),
-                  scene.rexUI.add.label({
-                    background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
-                    text: scene.add.text(0, 0, 'Paper', {
-                        fontSize: '20px'
-                    }),
-                    space: {
-                        left: 15,
-                        right: 15,
-                        top: 10,
-                        bottom: 10
-                    }
-                  }),
-
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0xe91e63).setScrollFactor(0).setDepth(30),
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x673ab7).setScrollFactor(0).setDepth(30),
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x2196f3).setScrollFactor(0).setDepth(30),
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x00bcd4).setScrollFactor(0).setDepth(30),
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0x4caf50).setScrollFactor(0).setDepth(30),
+                  scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, 0xcddc39).setScrollFactor(0).setDepth(30),
               ],
     
               actionsAlign: 'left',
@@ -351,10 +307,13 @@ class GameScene extends Phaser.Scene {
       dialog
           .on('button.click', function (button, groupName, index) {
               onClick(button.fillColor);
-              score++// increment the score
-              text.setText(`Coins: ${score}x`);
-              console.log(button.text)
           })
+          .on('button.over', function (button, groupName, index) {
+              button.setStrokeStyle(2, 0xffffff);
+          })
+          .on('button.out', function (button, groupName, index) {
+              button.setStrokeStyle();
+          });
     
       return dialog;
     }
