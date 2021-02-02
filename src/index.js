@@ -311,7 +311,7 @@ function hitGarbage() {
 //         button.getElement('background').setStrokeStyle();
 //     });
 var data = {
-  name: 'Rex',
+  // name: 'Rex',
   skills: [
       { name: 'A' },
       { name: 'B' },
@@ -319,21 +319,21 @@ var data = {
       { name: 'D' },
       { name: 'E' },
   ],
-  items: [
-      { name: 'A' },
-      { name: 'B' },
-      { name: 'C' },
-      { name: 'D' },
-      { name: 'E' },
-      { name: 'F' },
-      { name: 'G' },
-      { name: 'H' },
-      { name: 'I' },
-      { name: 'J' },
-      { name: 'K' },
-      { name: 'L' },
-      { name: 'M' },
-  ],
+  // items: [
+  //     { name: 'A' },
+  //     { name: 'B' },
+  //     { name: 'C' },
+  //     { name: 'D' },
+  //     { name: 'E' },
+  //     { name: 'F' },
+  //     { name: 'G' },
+  //     { name: 'H' },
+  //     { name: 'I' },
+  //     { name: 'J' },
+  //     { name: 'K' },
+  //     { name: 'L' },
+  //     { name: 'M' },
+  // ],
 
 };
 
@@ -379,7 +379,7 @@ scrollablePanel = this.rexUI.add.scrollablePanel({
 this.input.topOnly = false;
 var labels = [];
 labels.push(...scrollablePanel.getElement('#skills.items', true));
-labels.push(...scrollablePanel.getElement('#items.items', true));
+// labels.push(...scrollablePanel.getElement('#items.items', true));
 var scene = this;
 labels.forEach(function (label) {
   if (!label) {
@@ -396,12 +396,18 @@ labels.forEach(function (label) {
         
         // }, this);
         
-       scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
         
             gameObject.x = dragX;
             gameObject.y = dragY;
         
         });
+        scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
+        
+          console.log('dragend testing...');
+          //label.scaleDownDestroy(1);
+      
+      });
 
           if (!label.getTopmostSizer().isInTouching()) {
               return;
@@ -490,7 +496,7 @@ function update(time, delta) {
     if (!(overlap.width===0 && overlap.height===0))
     {   
         collider.active = false;
-        console.log('Drag the sprites. Overlapping: true');
+        // console.log('Drag the sprites. Overlapping: true');
     }
     else
     {   
@@ -504,7 +510,7 @@ function update(time, delta) {
           scrollablePanel.scaleDownDestroy(1);
           scrollablePanel=undefined
         }
-        console.log('Drag the sprites. Overlapping: false');
+        // console.log('Drag the sprites. Overlapping: false');
     }
     // console.log(zone.getBounds());
     // console.log(player.getBounds());
@@ -524,18 +530,18 @@ var createPanel = function (scene, data) {
       orientation: 'x',
       space: { item: 10 }
   })
-      .add(
-          createHeader(scene, data), // child
-          { expand: true }
-      )
+      // .add(
+      //     createHeader(scene, data), // child
+      //     { expand: true }
+      // )
       .add(
           createTable(scene, data, 'skills', 1), // child
           { expand: true }
       )
-      .add(
-          createTable(scene, data, 'items', 2), // child
-          { expand: true }
-      )
+      // .add(
+      //     createTable(scene, data, 'items', 2), // child
+      //     { expand: true }
+      // )
   return sizer;
 }
 
