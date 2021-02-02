@@ -10,6 +10,7 @@ let collider;
 //
   let score=0;
   let text;
+  let dialog;
 
 var config = {
     key: 'GameScene',
@@ -85,17 +86,28 @@ class GameScene extends Phaser.Scene {
       //   },
       //   add: true
       // });
-      zone = this.add.zone(garbagePoint.x, garbagePoint.y, "garbage")
-            .setSize(100, 100);
+      // zone = this.add.zone(garbagePoint.x, garbagePoint.y, "garbage")
+      //       .setSize(100, 100);
+
+      zone = this.add.sprite(garbagePoint.x, garbagePoint.y,'garbage').setScale(0.15,0.15)
       // // Watch the player and worldLayer for collisions, for the duration of the scene:
       this.physics.world.enable(zone);
       zone.body.setAllowGravity(false);
       zone.body.moves = false;
       this.physics.add.collider(player, worldLayer);
+
+      
     
-      collider = this.physics.add.overlap(player, zone, function (){
+      collider = this.physics.add.overlap(player, zone, function (zone,player){
         collider.active = false;
-        console.log("in here");
+
+       
+        
+        // else if (!dialog.isInTouching(pointer)) {
+        //     dialog.scaleDownDestroy(100);
+        //     dialog = undefined;
+        //     console.log('dsfsssasja')
+        // }
         // hitGarbage(garbage);
       }, null, this);
     
@@ -187,31 +199,77 @@ class GameScene extends Phaser.Scene {
 
 
       
-        var scene = this,
-        dialog = undefined;
-        this.input.on('pointerdown', function (pointer) {
-            var x = pointer.x,
-                y = pointer.y;
+        // var scene = this,
+        // dialog = undefined;
+        // this.input.on('pointerdown', function (pointer) {
+        //     var x = pointer.x,
+        //         y = pointer.y;
 
-            if (dialog === undefined) {
-                dialog = this.createDialog(this, x, y, function (color) {
-                    scene.add.circle(x, y, 20, color).setScrollFactor(0).setDepth(30);;
-                   // scene.print.text = 'Add object at (' + x + ',' + y + ')';
-                    dialog.scaleDownDestroy(100);
-                    dialog = undefined;
+        //     if (dialog === undefined) {
+        //         dialog = this.createDialog(this, x, y, function (color) {
+        //             scene.add.circle(x, y, 20, color).setScrollFactor(0).setDepth(30);;
+        //            // scene.print.text = 'Add object at (' + x + ',' + y + ')';
+        //             dialog.scaleDownDestroy(100);
+        //             dialog = undefined;
                     
-                });
-                //scene.print.text = 'Click (' + x + ',' + y + ')';
-            } else if (!dialog.isInTouching(pointer)) {
-                dialog.scaleDownDestroy(100);
-                dialog = undefined;
-                console.log('dsfsssasja')
-            }
-          }, this);
+        //         });
+        //         //scene.print.text = 'Click (' + x + ',' + y + ')';
+        //     } else if (!dialog.isInTouching(pointer)) {
+        //         dialog.scaleDownDestroy(100);
+        //         dialog = undefined;
+        //         console.log('dsfsssasja')
+        //     }
+        //   }, this);
 
           
     }
     update() {
+
+      score = score+0.1;
+      var overlap = this.checkOverlap(player, zone);
+      
+      if (!(overlap.width===0 && overlap.height===0))
+      {   
+          collider.active = false;
+          var scene = this
+          
+          if(dialog===undefined){
+            this.input.on('pointerdown', function (pointer) {
+              var x = pointer.x,
+                  y = pointer.y;
+
+              if (dialog === undefined) {
+                  dialog = this.createDialog(this, x, y, function (color) {
+                      scene.add.circle(x, y, 20, color).setScrollFactor(0).setDepth(30);;
+                    // scene.print.text = 'Add object at (' + x + ',' + y + ')';
+                      dialog.scaleDownDestroy(100);
+                      dialog = undefined;
+                      
+                  });
+                  //scene.print.text = 'Click (' + x + ',' + y + ')';
+              } else if (!dialog.isInTouching(pointer)) {
+                  dialog.scaleDownDestroy(100);
+                  dialog = undefined;
+                  console.log('dsfsssasja')
+              }
+            }, this);
+          }
+          
+      }
+      else
+      {   
+        collider.active = true;
+        
+        console.log('gi')
+        
+        if(dialog!==undefined){
+          dialog.scaleDownDestroy(100);
+          dialog = undefined;
+
+          
+        }
+      
+      }
       
       const speed = 500;
       const prevVelocity = player.body.velocity.clone();
@@ -253,19 +311,13 @@ class GameScene extends Phaser.Scene {
         else if (prevVelocity.y < 0) player.setTexture("atlas", "misa-back");
         else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
     
-        score = score+0.1;
-        var overlap = this.checkOverlap(player, zone);
-        if (!(overlap.width===0 && overlap.height===0))
-        {   
-            collider.active = false;
-            console.log('Drag the sprites. Overlapping: true');
-        }
-        else
-        {   collider.active = true;
-            console.log('Drag the sprites. Overlapping: false');
-        }
+       
        
       }
+
+      
+
+     
     }
 
 
@@ -276,6 +328,7 @@ class GameScene extends Phaser.Scene {
     
               background: scene.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0xf57f17).setScrollFactor(0).setDepth(30),
     
+              
               title: scene.rexUI.add.label({
                   background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
                   text: scene.add.text(0, 0, 'Pick a color', {
@@ -326,6 +379,7 @@ class GameScene extends Phaser.Scene {
               button.setStrokeStyle();
           });
     
+       
       return dialog;
     }
 
