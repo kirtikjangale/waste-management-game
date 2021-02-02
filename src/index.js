@@ -29,7 +29,7 @@ let showDebug = false;
 let garbage;
 let zone;
 let collider;
-
+let dialog;
 //
   let score=0;
   let text;
@@ -90,16 +90,17 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
-  // garbage = this.make.image({
-  //   x: garbagePoint.x, 
-  //   y: garbagePoint.y, 
-  //   key: "garbage",
-  //   scale:{
-  //     x: 0.3,
-  //     y: 0.3
-  //   },
-  //   add: true
-  // });
+  garbage = this.make.image({
+    x: garbagePoint.x, 
+    y: garbagePoint.y, 
+    key: "garbage",
+    scale:{
+      x: 0.3,
+      y: 0.3
+    },
+    add: true
+  });
+
   zone = this.add.zone(garbagePoint.x, garbagePoint.y, "garbage")
         .setSize(100, 100);
   // // Watch the player and worldLayer for collisions, for the duration of the scene:
@@ -108,11 +109,7 @@ function create() {
   zone.body.moves = false;
   this.physics.add.collider(player, worldLayer);
 
-  collider = this.physics.add.overlap(player, zone, function (){
-    collider.active = false;
-    console.log("in here");
-    // hitGarbage(garbage);
-  }, null, this);
+  collider = this.physics.add.overlap(player, zone, hitGarbage, null, this);
 
   // this.physics.add.collider(player, garbage, hitGarbage, null, this);
   // // Create the player's walking animations from the texture atlas. These are stored in the global
@@ -203,8 +200,9 @@ function create() {
 //show(garbage){
 //}
 
-function hitGarbage(garbage) {
-  var dialog = this.rexUI.add.dialog({
+function hitGarbage() {
+  collider.active = false;
+  dialog = this.rexUI.add.dialog({
     x: garbage.x,
     y: garbage.y,
     width: 500,
@@ -303,7 +301,6 @@ function hitGarbage(garbage) {
     .on('button.out', function (button, groupName, index, pointer, event) {
         button.getElement('background').setStrokeStyle();
     });
-  console.log("player collided with garbage!");
   
 }
 
@@ -385,7 +382,12 @@ function update(time, delta) {
         console.log('Drag the sprites. Overlapping: true');
     }
     else
-    {   collider.active = true;
+    {   
+        collider.active = true;
+        if(dialog){
+          dialog.scaleDownDestroy(100);
+          dialog = undefined;
+        }
         console.log('Drag the sprites. Overlapping: false');
     }
     // console.log(zone.getBounds());
