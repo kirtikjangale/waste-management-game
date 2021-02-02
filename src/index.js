@@ -216,11 +216,11 @@ function hitGarbage() {
 var data = {
   // name: 'Rex',
   skills: [
-      { name: 'A' },
-      { name: 'B' },
-      { name: 'C' },
-      { name: 'D' },
-      { name: 'E' },
+      { name: 'A' , category: 'category-1'},
+      { name: 'B' , category: 'category-1'},
+      { name: 'C' , category: 'category-2'},
+      { name: 'D' , category: 'category-2'},
+      { name: 'E' , category: 'category-3'},
   ],
 
 };
@@ -325,72 +325,42 @@ labels.forEach(function (label) {
   var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
       .on('click', function () {
 
-          scene.input.setDraggable(label)
-        //   scene.input.on('dragstart', function (pointer, gameObject) {
-
-        //     this.children.bringToTop(gameObject);
-        
-        // }, this);
-        
+        scene.input.setDraggable(label)
         scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-        
             gameObject.x = dragX;
             gameObject.y = dragY;
         
         });
-        scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
-        
-          console.log('dragend testing...');
-          //label.scaleDownDestroy(1);
-      
-      });
+        // scene.input.on('dragenter', function (pointer, gameObject, zone) {
 
-      scene.input.on('drop', function (pointer, gameObject, dropZone) {
+        //   graphics.clear();
+        //   graphics.lineStyle(2, 0x00ffff);
+        //   graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
+  
+        // });
 
-        gameObject.x = dropZone.x;
-        gameObject.y = dropZone.y;
+        // scene.input.on('dragleave', function (pointer, gameObject, zone) {
 
-        gameObject.input.enabled = false;
+        //   graphics.clear();
+        //   graphics.lineStyle(2, 0xffff00);
+        //   graphics.strokeRect(zone.x - zone.input.hitArea.width / 2, zone.y - zone.input.hitArea.height / 2, zone.input.hitArea.width, zone.input.hitArea.height);
+  
+        // });
+
+        scene.input.on('drop', function (pointer, gameObject, dropZone) {
+          console.log(dropZone.name, label.getElement("icon").name);
+          if(dropZone.name === label.getElement("icon").name){
+            // console.log("in here 1");
+            gameObject.x = dropZone.x;
+            gameObject.y = dropZone.y;
+            gameObject.scaleDownDestroy(100);
+          }else{
+            // console.log("in here 2");
+            gameObject.x = gameObject.input.dragStartX,
+            gameObject.y = gameObject.input.dragStartY
+          }
 
     });
-
-          if (!label.getTopmostSizer().isInTouching()) {
-              return;
-          }
-          var category = label.getParentSizer().name;
-          score+=1;
-          console.log(`${category}:${label.text}\n`)
-          text.setText(`Score:${score}`)
-      });
-})
-
-labelsdropzone.forEach(function (label) {
-  if (!label) {
-      return;
-  }
-
-  var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
-      .on('click', function () {
-
-          scene.input.setDraggable(label)
-        //   scene.input.on('dragstart', function (pointer, gameObject) {
-
-        //     this.children.bringToTop(gameObject);
-        
-        // }, this);
-        
-        scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-        
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-        
-        });
-        scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
-        
-          console.log('dragend testing...');
-          //label.scaleDownDestroy(1);
-      
-      });
 
           if (!label.getTopmostSizer().isInTouching()) {
               return;
@@ -626,6 +596,8 @@ var createIcon = function (scene, item, iconWidth, iconHeight, type) {
         text: scene.add.text(0, 0, item.name),
         space: { icon: 3 }
     }).setInteractive();
+    console.log(item.category);
+    label.getElement('icon').name = item.category;
   }else if(type==="dropzone"){
     var label = scene.rexUI.add.label({
       orientation: 'y',
@@ -633,8 +605,8 @@ var createIcon = function (scene, item, iconWidth, iconHeight, type) {
       text: scene.add.text(0, 0, item.name),
       space: { icon: 3 }
     }).setInteractive();
+    label.getElement('icon').name = item.name;
   }
-  
 
   return label;
 };
