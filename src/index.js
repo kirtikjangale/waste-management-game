@@ -212,105 +212,7 @@ function create() {
 
 function hitGarbage() {
   collider.active = false;
-//   dialog = this.rexUI.add.dialog({
-//     x: garbage.x,
-//     y: garbage.y,
-//     width: 500,
 
-//     background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
-
-//     title: createLabel(this, 'Title').setDraggable(),
-
-//     toolbar: [
-//         createLabel(this, 'O'),
-//         createLabel(this, 'X')
-//     ],
-
-//     leftToolbar: [
-//         createLabel(this, 'A'),
-//         createLabel(this, 'B')
-//     ],  
-
-//     content: createLabel(this, 'Content'),
-
-//     description: createLabel(this, 'Description'),
-
-//     choices: [
-//         createLabel(this, 'Choice0'),
-//         createLabel(this, 'Choice1'),
-//         createLabel(this, 'Choice2')
-//     ],
-
-//     actions: [
-//         createLabel(this, 'Action0'),
-//         createLabel(this, 'Action1')
-//     ],
-
-//     space: {
-//         left: 20,
-//         right: 20,
-//         top: -20,
-//         bottom: -20,
-
-//         title: 25,
-//         titleLeft: 30,
-//         content: 25,
-//         description: 25,
-//         descriptionLeft: 20,
-//         descriptionRight: 20,
-//         choices: 25,
-
-//         toolbarItem: 5,
-//         choice: 15,
-//         action: 15,
-//     },
-
-//     expand: {
-//         title: false,
-//         // content: false,
-//         // description: false,
-//         // choices: false,
-//         // actions: true,
-//     },
-
-//     align: {
-//         title: 'center',
-//         // content: 'left',
-//         // description: 'left',
-//         // choices: 'left',
-//         actions: 'right', // 'center'|'left'|'right'
-//     },
-
-//     click: {
-//         mode: 'release'
-//     }
-//   })
-//   .setDraggable('background')   // Draggable-background
-//   .layout()
-// // .drawBounds(this.add.graphics(), 0xff0000)
-//   .popUp(1000);
-
-//   var tween = this.tweens.add({
-//     targets: dialog,
-//     scaleX: 1,
-//     scaleY: 1,
-//     ease: 'Bounce', // 'Cubic', 'Elastic', 'Bounce', 'Back'
-//     duration: 1000,
-//     repeat: 0, // -1: infinity
-//     yoyo: false
-// });
-
-//   this.print = this.add.text(0, 0, '');
-//   dialog
-//     .on('button.click', function (button, groupName, index, pointer, event) {
-//         this.print.text += groupName + '-' + index + ': ' + button.text + '\n';
-//     }, this)
-//     .on('button.over', function (button, groupName, index, pointer, event) {
-//         button.getElement('background').setStrokeStyle(1, 0xffffff);
-//     })
-//     .on('button.out', function (button, groupName, index, pointer, event) {
-//         button.getElement('background').setStrokeStyle();
-//     });
 var data = {
   // name: 'Rex',
   skills: [
@@ -320,21 +222,6 @@ var data = {
       { name: 'D' },
       { name: 'E' },
   ],
-  // items: [
-  //     { name: 'A' },
-  //     { name: 'B' },
-  //     { name: 'C' },
-  //     { name: 'D' },
-  //     { name: 'E' },
-  //     { name: 'F' },
-  //     { name: 'G' },
-  //     { name: 'H' },
-  //     { name: 'I' },
-  //     { name: 'J' },
-  //     { name: 'K' },
-  //     { name: 'L' },
-  //     { name: 'M' },
-  // ],
 
 };
 
@@ -358,7 +245,7 @@ dropzonepanel = this.rexUI.add.scrollablePanel({
   background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
 
   panel: {
-      child: createPanel(this, dropzonedata ),
+      child: createPanel(this, dropzonedata, "dropzone"),
 
       mask: {
           padding: 1
@@ -394,7 +281,7 @@ scrollablePanel = this.rexUI.add.scrollablePanel({
       background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
 
       panel: {
-          child: createPanel(this, data),
+          child: createPanel(this, data, "icon"),
 
           mask: {
               padding: 1
@@ -457,6 +344,15 @@ labels.forEach(function (label) {
           //label.scaleDownDestroy(1);
       
       });
+
+      scene.input.on('drop', function (pointer, gameObject, dropZone) {
+
+        gameObject.x = dropZone.x;
+        gameObject.y = dropZone.y;
+
+        gameObject.input.enabled = false;
+
+    });
 
           if (!label.getTopmostSizer().isInTouching()) {
               return;
@@ -617,7 +513,7 @@ function update(time, delta) {
   }
 }
 
-var createPanel = function (scene, data) {
+var createPanel = function (scene, data, type) {
   var sizer = scene.rexUI.add.sizer({
       orientation: 'x',
       space: { item: 10 }
@@ -627,7 +523,7 @@ var createPanel = function (scene, data) {
       //     { expand: true }
       // )
       .add(
-          createTable(scene, data, 'skills', 1), // child
+          createTable(scene, data, 'skills', 1, type), // child
           { expand: true }
       )
       // .add(
@@ -666,7 +562,7 @@ var createHeader = function (scene, data) {
       );
 };
 
-var createTable = function (scene, data, key, rows) {
+var createTable = function (scene, data, key, rows, type) {
   var capKey = key.charAt(0).toUpperCase() + key.slice(1);
   var title = scene.rexUI.add.label({
       orientation: 'x',
@@ -691,7 +587,7 @@ var createTable = function (scene, data, key, rows) {
       r = i % rows;
       c = (i - r) / rows;
       table.add(
-          createIcon(scene, item, iconSize, iconSize),
+          createIcon(scene, item, iconSize, iconSize, type),
           c,
           r,
           'top',
@@ -722,13 +618,23 @@ var createTable = function (scene, data, key, rows) {
       );
 }
 
-var createIcon = function (scene, item, iconWidth, iconHeight) {
-  var label = scene.rexUI.add.label({
+var createIcon = function (scene, item, iconWidth, iconHeight, type) {
+  if(type==="icon"){
+    var label = scene.rexUI.add.label({
+        orientation: 'y',
+        icon: scene.add.image(0,0,'garbage').setScrollFactor(0).setDepth(30).setScale(0.3,0.4),
+        text: scene.add.text(0, 0, item.name),
+        space: { icon: 3 }
+    }).setInteractive();
+  }else if(type==="dropzone"){
+    var label = scene.rexUI.add.label({
       orientation: 'y',
-      icon: scene.add.image(0,0,'garbage').setScrollFactor(0).setDepth(30).setScale(0.3,0.4),
+      icon: scene.add.zone(0, 0, iconWidth, iconHeight).setRectangleDropZone(iconWidth, iconHeight), 
       text: scene.add.text(0, 0, item.name),
       space: { icon: 3 }
-  }).setInteractive();
+    }).setInteractive();
+  }
+  
 
   return label;
 };
