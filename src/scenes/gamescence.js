@@ -320,6 +320,7 @@ class GameScene extends Phaser.Scene {
      
     }
 
+    
 
     createDialog(scene, x, y, onClick) {
       var dialog = scene.rexUI.add.dialog({
@@ -328,7 +329,7 @@ class GameScene extends Phaser.Scene {
     
               background: scene.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0xf57f17).setScrollFactor(0).setDepth(30),
     
-              
+
               title: scene.rexUI.add.label({
                   background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0xbc5100).setScrollFactor(0).setDepth(30),
                   text: scene.add.text(0, 0, 'Pick a color', {
