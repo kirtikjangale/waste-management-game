@@ -30,6 +30,7 @@ let garbage;
 let zone;
 let collider;
 let dialog;
+let scrollablePanel;
 //
   let score=0;
   let text;
@@ -201,6 +202,18 @@ function create() {
   .setScrollFactor(0)
   .setDepth(30);
 
+  this.input.on('dragstart', function (pointer, gameObject) {
+
+    this.children.bringToTop(gameObject);
+
+}, this);
+
+this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+
+    gameObject.x = dragX;
+    gameObject.y = dragY;
+
+});
             
 
 }//end create()
@@ -335,7 +348,7 @@ var data = {
 
 };
 
-var scrollablePanel = this.rexUI.add.scrollablePanel({
+scrollablePanel = this.rexUI.add.scrollablePanel({
       x: 400,
       y: 300,
       width: 400,
@@ -386,6 +399,8 @@ labels.forEach(function (label) {
 
   var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
       .on('click', function () {
+
+          scene.input.setDraggable(label)
           if (!label.getTopmostSizer().isInTouching()) {
               return;
           }
@@ -481,6 +496,11 @@ function update(time, delta) {
         if(dialog){
           dialog.scaleDownDestroy(100);
           dialog = undefined;
+        }
+
+        if(scrollablePanel){
+          scrollablePanel.scaleDownDestroy(1);
+          scrollablePanel=undefined
         }
         console.log('Drag the sprites. Overlapping: false');
     }
@@ -607,9 +627,8 @@ var createIcon = function (scene, item, iconWidth, iconHeight) {
       orientation: 'y',
       icon: scene.add.image(0,0,'garbage').setScrollFactor(0).setDepth(30).setScale(0.3,0.4),
       text: scene.add.text(0, 0, item.name),
-
       space: { icon: 3 }
-  });
+  }).setInteractive();
 
   return label;
 };
