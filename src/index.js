@@ -202,18 +202,7 @@ function create() {
   .setScrollFactor(0)
   .setDepth(30);
 
-  this.input.on('dragstart', function (pointer, gameObject) {
-
-    this.children.bringToTop(gameObject);
-
-}, this);
-
-this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
-    gameObject.x = dragX;
-    gameObject.y = dragY;
-
-});
+  
             
 
 }//end create()
@@ -401,6 +390,19 @@ labels.forEach(function (label) {
       .on('click', function () {
 
           scene.input.setDraggable(label)
+        //   scene.input.on('dragstart', function (pointer, gameObject) {
+
+        //     this.children.bringToTop(gameObject);
+        
+        // }, this);
+        
+       scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        
+        });
+
           if (!label.getTopmostSizer().isInTouching()) {
               return;
           }
