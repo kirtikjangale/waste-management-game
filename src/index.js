@@ -31,6 +31,7 @@ let zone;
 let collider;
 let dialog;
 let scrollablePanel;
+let dropzonepanel;      
 //
   let score=0;
   let text;
@@ -337,6 +338,51 @@ var data = {
 
 };
 
+var dropzonedata = {
+  skills: [
+    { name: 'category-1' },
+    { name: 'category-2' },
+    { name: 'category-3' },
+   
+],
+}
+
+dropzonepanel = this.rexUI.add.scrollablePanel({
+  x: 1000,
+  y: 300,
+  width: 400,
+  height: 220,
+
+  scrollMode: 1,
+
+  background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+
+  panel: {
+      child: createPanel(this, dropzonedata ),
+
+      mask: {
+          padding: 1
+      },
+  },
+
+  slider: {
+      track: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+      thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+  },
+
+  scroller: true,
+
+  space: {
+      left: 10,
+      right: 10,
+      top: 10,
+      bottom: 10,
+
+      panel: 10,
+  }
+})
+.layout().setScrollFactor(0).setDepth(30)
+
 scrollablePanel = this.rexUI.add.scrollablePanel({
       x: 400,
       y: 300,
@@ -372,16 +418,57 @@ scrollablePanel = this.rexUI.add.scrollablePanel({
       }
   })
   .layout().setScrollFactor(0).setDepth(30)
-//.drawBounds(this.add.graphics(), 0xff0000);
 
-// Set icon interactive
+
+
 
 this.input.topOnly = false;
 var labels = [];
 labels.push(...scrollablePanel.getElement('#skills.items', true));
-// labels.push(...scrollablePanel.getElement('#items.items', true));
+
+var labelsdropzone = [];
+labelsdropzone.push(...dropzonepanel.getElement('#skills.items', true));
+// // labels.push(...scrollablePanel.getElement('#items.items', true));
 var scene = this;
 labels.forEach(function (label) {
+  if (!label) {
+      return;
+  }
+
+  var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
+      .on('click', function () {
+
+          scene.input.setDraggable(label)
+        //   scene.input.on('dragstart', function (pointer, gameObject) {
+
+        //     this.children.bringToTop(gameObject);
+        
+        // }, this);
+        
+        scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+        
+            gameObject.x = dragX;
+            gameObject.y = dragY;
+        
+        });
+        scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
+        
+          console.log('dragend testing...');
+          //label.scaleDownDestroy(1);
+      
+      });
+
+          if (!label.getTopmostSizer().isInTouching()) {
+              return;
+          }
+          var category = label.getParentSizer().name;
+          score+=1;
+          console.log(`${category}:${label.text}\n`)
+          text.setText(`Score:${score}`)
+      });
+})
+
+labelsdropzone.forEach(function (label) {
   if (!label) {
       return;
   }
@@ -509,6 +596,11 @@ function update(time, delta) {
         if(scrollablePanel){
           scrollablePanel.scaleDownDestroy(1);
           scrollablePanel=undefined
+        }
+
+        if(dropzonepanel){
+          dropzonepanel.scaleDownDestroy(1);
+          dropzonepanel=undefined
         }
         // console.log('Drag the sprites. Overlapping: false');
     }
