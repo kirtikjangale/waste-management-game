@@ -67,7 +67,18 @@
                  "width":0,
                  "x":530.028214264852,
                  "y":1960.86453647993
-                }, 
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"Garbage",
+         "objects":[
                 {
                  "height":34.0557275541796,
                  "id":2,
@@ -78,6 +89,50 @@
                  "width":43.3436532507741,
                  "x":712.074303405573,
                  "y":1947.36842105263
+                }, 
+                {
+                 "height":34.0557275541796,
+                 "id":3,
+                 "name":"Garbage",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":43.3436532507741,
+                 "x":848.297213622291,
+                 "y":1606.81114551083
+                }, 
+                {
+                 "height":34.0557275541796,
+                 "id":4,
+                 "name":"Garbage",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":43.3436532507741,
+                 "x":2040.24767801858,
+                 "y":1687.30650154799
+                }, 
+                {
+                 "height":34.0557275541796,
+                 "id":5,
+                 "name":"Garbage",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":43.3436532507741,
+                 "x":331.269349845202,
+                 "y":1111.45510835913
+                }, 
+                {
+                 "height":34.0557275541796,
+                 "id":6,
+                 "name":"Garbage",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":43.3436532507741,
+                 "x":2386.99690402477,
+                 "y":1956.65634674922
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -85,8 +140,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":3,
+ "nextlayerid":7,
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
+import wastes from './store'
 // const height = window.innerHeight;
 
 const config = {
@@ -27,12 +28,11 @@ const game = new Phaser.Game(config);
 let cursors;
 let player;
 let showDebug = false;
-let garbage;
-let zone;
-let collider;
-let dialog;
+let activeSprite;
 let scrollablePanel;
-let dropzonepanel;      
+let dropzonepanel;  
+let garbageLayer;    
+let garbages;
 //
   let score=0;
   let text;
@@ -46,7 +46,7 @@ function preload() {
   this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
    // this.load.tilemapTiledJSON("map", "./assets/tilemaps/trial.json");
   // this.load.tilemapTiledJSON("map", "./assets/tilemaps/city3.json");
-  this.load.tilemapTiledJSON("map", "./assets/tilemaps/map7.json");
+  this.load.tilemapTiledJSON("map", "./assets/tilemaps/map6.json");
   // // An atlas is a way to pack multiple images together into one texture. I'm using it to load all
   // // the player animations (walking left, walking right, etc.) in one image. For more info see:
   // //  https://labs.phaser.io/view.html?src=src/animation/texture%20atlas%20animation.js
@@ -69,7 +69,7 @@ function create() {
   const belowLayer = map.createStaticLayer("Below Player", tileset, 0, 0);
   const worldLayer = map.createStaticLayer("World", tileset, 0, 0);
   const aboveLayer = map.createStaticLayer("Above Player", tileset, 0, 0);
-
+  garbageLayer = map.getObjectLayer("Garbage")['objects']
   
   worldLayer.setCollisionByProperty({ collides: true });
 
@@ -82,36 +82,45 @@ function create() {
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
 
   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-  const garbagePoint = map.findObject("Objects", obj => obj.name === "Garbage");
-
-  // // Create a sprite with physics enabled via the physics system. The image used for the sprite has
-  // // a bit of whitespace, so I'm using setSize & setOffset to control the size of the player's body.
+  const garbagePoint = map.findObject("Garbage", obj => obj.name === "Garbage");
+  console.log(garbagePoint);
 
   player = this.physics.add
     .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
     .setSize(30, 40)
     .setOffset(0, 24);
 
-  garbage = this.make.image({
-    x: garbagePoint.x, 
-    y: garbagePoint.y, 
-    key: "garbage",
-    scale:{
-      x: 0.3,
-      y: 0.3
-    },
-    add: true
-  });
+  garbages = this.physics.add.staticGroup();
+  garbageLayer.forEach(object => {
+    let obj = garbages.create(object.x, object.y, "garbage"); 
+       obj.scaleX = 0.3;
+       obj.scaleY = 0.3;
+       obj.setOrigin(0); 
+       obj.body.width = object.width; 
+       obj.body.height = object.height;
+       
+      //generating random waste object
+      const sz = 5;
+      let arr = [];
+      for(let i=0;i<sz;i++){
+        arr.push(wastes[Math.floor(Math.random() * wastes.length)])
+      }
+      arr.forEach((obj) => obj.amt = 30);
+      obj.garbageCont = arr;
+      obj.collider = this.physics.add.overlap(player, obj, hitGarbage, null, this);
+      console.log(obj);
+  })
+  // console.log(garbages.children.entries[1]);
 
-  zone = this.add.zone(garbagePoint.x, garbagePoint.y, "garbage")
-        .setSize(100, 100);
+  // zone = 
   
-  this.physics.world.enable(zone);
-  zone.body.setAllowGravity(false);
-  zone.body.moves = false;
+  // this.physics.world.enable(zone);
+  // zone.body.setAllowGravity(false);
+  // zone.body.moves = false;
+
   this.physics.add.collider(player, worldLayer);
 
-  collider = this.physics.add.overlap(player, zone, hitGarbage, null, this);
+  // collider = this.physics.add.overlap(player, zone, hitGarbage, null, this);
 
   const anims = this.anims;
   anims.create({
@@ -191,25 +200,21 @@ function create() {
   })
   .setScrollFactor(0)
   .setDepth(30);
-
-  
-            
-
 }
 
 function hitGarbage() {
-  collider.active = false;
+  var scene = this;
+  console.log("in here");
+
+  garbages.children.entries.forEach((obj) => {
+    if(obj.collider === false){
+      activeSprite = obj;
+    }
+  })
 
   var data = {
     // name: 'Rex',
-    skills: [
-        { name: 'A' , category: 'category-1'},
-        { name: 'B' , category: 'category-1'},
-        { name: 'C' , category: 'category-2'},
-        { name: 'D' , category: 'category-2'},
-        { name: 'E' , category: 'category-3'},
-    ],
-
+    skills: activeSprite.garbageCont
   };
 
   var dropzonedata = {
@@ -217,11 +222,10 @@ function hitGarbage() {
       { name: 'category-1' },
       { name: 'category-2' },
       { name: 'category-3' },
-    
-  ],
+    ],
   }
 
-  dropzonepanel = this.rexUI.add.scrollablePanel({
+  dropzonepanel = scene.rexUI.add.scrollablePanel({
     x: 1000,
     y: 300,
     width: 400,
@@ -229,10 +233,10 @@ function hitGarbage() {
 
     scrollMode: 1,
 
-    background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
 
     panel: {
-        child: createPanel(this, dropzonedata, "dropzone"),
+        child: createPanel(scene, dropzonedata, "dropzone"),
 
         mask: {
             padding: 1
@@ -240,8 +244,8 @@ function hitGarbage() {
     },
 
     slider: {
-        track: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-        thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
     },
 
     scroller: true,
@@ -257,7 +261,7 @@ function hitGarbage() {
   })
   .layout().setScrollFactor(0).setDepth(30)
 
-scrollablePanel = this.rexUI.add.scrollablePanel({
+scrollablePanel = scene.rexUI.add.scrollablePanel({
       x: 400,
       y: 300,
       width: 400,
@@ -265,18 +269,18 @@ scrollablePanel = this.rexUI.add.scrollablePanel({
 
       scrollMode: 1,
 
-      background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+      background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
 
       panel: {
-          child: createPanel(this, data, "icon"),
+          child: createPanel(scene, data, "icon"),
           mask: {
               padding: 1
           },
       },
 
       slider: {
-          track: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-          thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+          track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+          thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
       },
 
       // scroller: true,
@@ -295,14 +299,14 @@ scrollablePanel = this.rexUI.add.scrollablePanel({
 
 
 
-this.input.topOnly = false;
+scene.input.topOnly = false;
 var labels = [];
 labels.push(...scrollablePanel.getElement('#skills.items', true));
 
 var labelsdropzone = [];
 labelsdropzone.push(...dropzonepanel.getElement('#skills.items', true));
 // // labels.push(...scrollablePanel.getElement('#items.items', true));
-var scene = this;
+
 labels.forEach(function (label) {
   if (!label) {
       return;
@@ -396,30 +400,30 @@ function update(time, delta) {
     else if (prevVelocity.y < 0) player.setTexture("atlas", "misa-back");
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
+    garbages.children.entries.forEach((obj) => {
+      var overlap = checkOverlap(player, obj);
+      // activeSprite = obj;
+      if (!(overlap.width===0 && overlap.height===0))
+      {   
+          obj.collider.active = false;
+          console.log('Drag the sprites. Overlapping: true', activeSprite);
+      }
+      else
+      {   
+          obj.collider.active = true;
+  
+          if(scrollablePanel){
+            scrollablePanel.scaleDownDestroy(1);
+            scrollablePanel=undefined
+          }
+  
+          if(dropzonepanel){
+            dropzonepanel.scaleDownDestroy(1);
+            dropzonepanel=undefined
+          }
+      }
+    })
     score = score+0.1;
-    var overlap = checkOverlap(player, zone);
-    if (!(overlap.width===0 && overlap.height===0))
-    {   
-        collider.active = false;
-        // console.log('Drag the sprites. Overlapping: true');
-    }
-    else
-    {   
-        collider.active = true;
-        if(dialog){
-          dialog.scaleDownDestroy(100);
-          dialog = undefined;
-        }
-
-        if(scrollablePanel){
-          scrollablePanel.scaleDownDestroy(1);
-          scrollablePanel=undefined
-        }
-
-        if(dropzonepanel){
-          dropzonepanel.scaleDownDestroy(1);
-          dropzonepanel=undefined
-        }
-    }
+    
   }
 }
