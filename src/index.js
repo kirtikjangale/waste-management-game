@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
 import wastes from './store'
-// const height = window.innerHeight;
+
 
 const config = {
   type: Phaser.AUTO,
@@ -33,9 +33,11 @@ let scrollablePanel;
 let dropzonepanel;  
 let garbageLayer;    
 let garbages;
+let overlapState=false;
 //
   let score=0;
   let text;
+
 //
 
 const COLOR_PRIMARY = 0x4e342e;
@@ -82,8 +84,7 @@ function create() {
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
 
   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-  const garbagePoint = map.findObject("Garbage", obj => obj.name === "Garbage");
-  console.log(garbagePoint);
+  
 
   player = this.physics.add
     .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
@@ -107,8 +108,13 @@ function create() {
       }
       arr.forEach((obj) => obj.amt = 30);
       obj.garbageCont = arr;
-      obj.collider = this.physics.add.overlap(player, obj, hitGarbage, null, this);
-      console.log(obj);
+
+     
+
+      // obj.collider = this.physics.add.overlap(player, obj,() => {
+      //     hitGarbage(this,obj)
+      // }, null, this);
+     
   })
   // console.log(garbages.children.entries[1]);
 
@@ -202,19 +208,15 @@ function create() {
   .setDepth(30);
 }
 
-function hitGarbage() {
-  var scene = this;
-  console.log("in here");
+function hitGarbage(scene,obj) {
 
-  garbages.children.entries.forEach((obj) => {
-    if(obj.collider === false){
-      activeSprite = obj;
-    }
-  })
+ console.log('hit garbage() called')
+  
+
+  
 
   var data = {
-    // name: 'Rex',
-    skills: activeSprite.garbageCont
+    skills: obj.garbageCont
   };
 
   var dropzonedata = {
@@ -323,7 +325,7 @@ labels.forEach(function (label) {
         });
 
         scene.input.on('drop', function (pointer, gameObject, dropZone) {
-          console.log(dropZone.name, label.getElement("icon").name);
+          //console.log(dropZone.name, label.getElement("icon").name);
           if(dropZone.name === label.getElement("icon").name){
             // console.log("in here 1");
             gameObject.x = dropZone.x;
@@ -343,7 +345,7 @@ labels.forEach(function (label) {
 
         var category = label.getParentSizer().name;
         score+=1;
-        console.log(`${category}:${label.text}\n`)
+        //console.log(`${category}:${label.text}\n`)
         text.setText(`Score:${score}`)
       });
   })
@@ -400,29 +402,39 @@ function update(time, delta) {
     else if (prevVelocity.y < 0) player.setTexture("atlas", "misa-back");
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
+    let cnt=0,sz=0;
+    
     garbages.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);
-      // activeSprite = obj;
-      if (!(overlap.width===0 && overlap.height===0))
-      {   
-          obj.collider.active = false;
-          console.log('Drag the sprites. Overlapping: true', activeSprite);
+      
+      sz++;
+      if (!(overlap.width===0 && overlap.height===0) && overlapState==false)
+      {  
+          overlapState=true 
+          hitGarbage(this,obj)
+          
       }
       else
       {   
-          obj.collider.active = true;
-  
-          if(scrollablePanel){
+         
+          if((overlap.width===0 && overlap.height===0))
+            cnt++;
+          
+          if(scrollablePanel && overlapState==false){
             scrollablePanel.scaleDownDestroy(1);
             scrollablePanel=undefined
           }
   
-          if(dropzonepanel){
+          if(dropzonepanel && overlapState==false){
             dropzonepanel.scaleDownDestroy(1);
             dropzonepanel=undefined
           }
       }
     })
+
+    if(cnt==sz && overlapState==true)
+      overlapState=false;
+   
     score = score+0.1;
     
   }

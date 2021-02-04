@@ -115,7 +115,7 @@ var createPanel = function (scene, data, type) {
           text: scene.add.text(0, 0, item.name),
           space: { icon: 3 }
       }).setInteractive();
-      console.log(item.category);
+      //console.log(item.category);
       label.getElement('icon').name = item.category;
     }else if(type==="dropzone"){
       var label = scene.rexUI.add.label({
