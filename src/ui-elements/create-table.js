@@ -117,6 +117,7 @@ var createPanel = function (scene, data, type) {
       }).setInteractive();
       //console.log(item.category);
       label.getElement('icon').name = item.category;
+      label.getElement('icon')._id = item._id;
     }else if(type==="dropzone"){
       var label = scene.rexUI.add.label({
         orientation: 'y',

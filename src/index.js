@@ -34,10 +34,12 @@ let dropzonepanel;
 let garbageLayer;    
 let garbages;
 let overlapState=false;
-//
-  let score=0;
-  let text;
+let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 
+//
+  let text1;
+  let text2;
+  let text3;
 //
 
 const COLOR_PRIMARY = 0x4e342e;
@@ -91,25 +93,28 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
+  
   garbages = this.physics.add.staticGroup();
   garbageLayer.forEach(object => {
+    var _id = 0;
     let obj = garbages.create(object.x, object.y, "garbage"); 
        obj.scaleX = 0.3;
        obj.scaleY = 0.3;
        obj.setOrigin(0); 
        obj.body.width = object.width; 
-       obj.body.height = object.height;
-       
+       obj.body.height = object.height; 
       //generating random waste object
       const sz = 5;
       let arr = [];
       for(let i=0;i<sz;i++){
-        arr.push(wastes[Math.floor(Math.random() * wastes.length)])
+        arr.push(Object.assign({}, wastes[Math.floor(Math.random() * wastes.length)]));
       }
-      arr.forEach((obj) => obj.amt = 30);
+      arr.forEach((obj) => {
+        obj._id = _id;
+        _id+=1;
+        obj.amt = 30;
+      });
       obj.garbageCont = arr;
-
-     
 
       // obj.collider = this.physics.add.overlap(player, obj,() => {
       //     hitGarbage(this,obj)
@@ -197,7 +202,7 @@ function create() {
     });
   });
 
-  text = this.add
+  text1 = this.add
   .text(16, 16, 'Arrow keys to move\nScore:0', {
     font: "18px monospace",
     fill: "#000000",
@@ -206,6 +211,26 @@ function create() {
   })
   .setScrollFactor(0)
   .setDepth(30);
+
+  // text2 = this.add
+  // .text(26, 16, 'Arrow keys to move\nScore:0', {
+  //   font: "18px monospace",
+  //   fill: "#000000",
+  //   padding: { x: 20, y: 10 },
+  //   backgroundColor: "#ffffff"
+  // })
+  // .setScrollFactor(0)
+  // .setDepth(30);
+
+  // text3 = this.add
+  // .text(36, 16, 'Arrow keys to move\nScore:0', {
+  //   font: "18px monospace",
+  //   fill: "#000000",
+  //   padding: { x: 20, y: 10 },
+  //   backgroundColor: "#ffffff"
+  // })
+  // .setScrollFactor(0)
+  // .setDepth(30);
 }
 
 function hitGarbage(scene,obj) {
@@ -221,9 +246,9 @@ function hitGarbage(scene,obj) {
 
   var dropzonedata = {
     skills: [
-      { name: 'category-1' },
-      { name: 'category-2' },
-      { name: 'category-3' },
+      { name: 'packaging' },
+      { name: 'ewaste' },
+      { name: 'biowaste' },
     ],
   }
 
@@ -299,8 +324,6 @@ scrollablePanel = scene.rexUI.add.scrollablePanel({
   .layout().setScrollFactor(0).setDepth(30)
 
 
-
-
 scene.input.topOnly = false;
 var labels = [];
 labels.push(...scrollablePanel.getElement('#skills.items', true));
@@ -325,12 +348,24 @@ labels.forEach(function (label) {
         });
 
         scene.input.on('drop', function (pointer, gameObject, dropZone) {
-          //console.log(dropZone.name, label.getElement("icon").name);
+          // console.log(dropZone.name, label.getElement("icon").name);
+          console.log(obj.garbageCont);
           if(dropZone.name === label.getElement("icon").name){
             // console.log("in here 1");
             gameObject.x = dropZone.x;
             gameObject.y = dropZone.y;
             gameObject.scaleDownDestroy(100);
+            const id = label.getElement("icon")._id;
+            console.log(id);
+            var amt = 0;
+            // console.log(label.getElement("icon").id);
+            obj.garbageCont = obj.garbageCont.filter((elem) => {
+              if(elem._id === id) amt = elem.amt;
+              return elem._id !== id;
+            })
+            console.log(obj.garbageCont);
+            gscore[dropZone.name] += amt;
+            console.log(gscore);
           }else{
             // console.log("in here 2");
             gameObject.x = gameObject.input.dragStartX,
@@ -344,9 +379,7 @@ labels.forEach(function (label) {
         }
 
         var category = label.getParentSizer().name;
-        score+=1;
         //console.log(`${category}:${label.text}\n`)
-        text.setText(`Score:${score}`)
       });
   })
   
@@ -405,14 +438,19 @@ function update(time, delta) {
     let cnt=0,sz=0;
     
     garbages.children.entries.forEach((obj) => {
+      if(obj.garbageCont.length === 0){
+        obj.destroy(obj.x, obj.y);
+      }
+    });
+
+    garbages.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);
       
       sz++;
       if (!(overlap.width===0 && overlap.height===0) && overlapState==false)
       {  
-          overlapState=true 
-          hitGarbage(this,obj)
-          
+          overlapState=true;
+          hitGarbage(this,obj);
       }
       else
       {   
@@ -434,8 +472,7 @@ function update(time, delta) {
 
     if(cnt==sz && overlapState==true)
       overlapState=false;
-   
-    score = score+0.1;
     
+      text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
 }
