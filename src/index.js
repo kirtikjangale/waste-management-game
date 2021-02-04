@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
 import wastes from './store'
-
+import createLabel from './ui-elements/create-dump'
 
 const config = {
   type: Phaser.AUTO,
@@ -30,10 +30,14 @@ let player;
 let showDebug = false;
 let activeSprite;
 let scrollablePanel;
-let dropzonepanel;  
+let dropzonepanel;
+let dialogDump;  
 let garbageLayer;    
+let dumpingLayer;
 let garbages;
+let dumpZones;
 let overlapState=false;
+let dumpState = false;
 let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 
 //
@@ -58,6 +62,7 @@ function preload() {
   // //  https://labs.phaser.io/view.html?src=src/animation/single%20sprite%20sheet.js
   this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
   this.load.image("garbage", "./assets/images/garbage.png");
+  this.load.image("dumping", "./assets/images/dumping.png");
   this.load.scenePlugin({
     key: 'rexuiplugin',
     url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
@@ -74,7 +79,7 @@ function create() {
   const worldLayer = map.createStaticLayer("World", tileset, 0, 0);
   const aboveLayer = map.createStaticLayer("Above Player", tileset, 0, 0);
   garbageLayer = map.getObjectLayer("Garbage")['objects']
-  
+  dumpingLayer = map.getObjectLayer("Dumping")['objects']
   worldLayer.setCollisionByProperty({ collides: true });
 
   // // By default, everything gets depth sorted on the screen in the order we created things. Here, we
@@ -115,23 +120,20 @@ function create() {
         obj.amt = 30;
       });
       obj.garbageCont = arr;
-
-      // obj.collider = this.physics.add.overlap(player, obj,() => {
-      //     hitGarbage(this,obj)
-      // }, null, this);
-     
   })
-  // console.log(garbages.children.entries[1]);
 
-  // zone = 
-  
-  // this.physics.world.enable(zone);
-  // zone.body.setAllowGravity(false);
-  // zone.body.moves = false;
+  dumpZones = this.physics.add.staticGroup();
+  dumpingLayer.forEach(object => {
+    let obj = dumpZones.create(object.x, object.y, "dumping");
+    obj.scaleX = 0.3;
+    obj.scaleY = 0.3;
+    obj.setOrigin(0);
+    obj.body.width = object.width; 
+    obj.body.height = object.height; 
+    obj.capacity = getRandomInt(30,60);
+  })
 
   this.physics.add.collider(player, worldLayer);
-
-  // collider = this.physics.add.overlap(player, zone, hitGarbage, null, this);
 
   const anims = this.anims;
   anims.create({
@@ -211,34 +213,11 @@ function create() {
   })
   .setScrollFactor(0)
   .setDepth(30);
-
-  // text2 = this.add
-  // .text(26, 16, 'Arrow keys to move\nScore:0', {
-  //   font: "18px monospace",
-  //   fill: "#000000",
-  //   padding: { x: 20, y: 10 },
-  //   backgroundColor: "#ffffff"
-  // })
-  // .setScrollFactor(0)
-  // .setDepth(30);
-
-  // text3 = this.add
-  // .text(36, 16, 'Arrow keys to move\nScore:0', {
-  //   font: "18px monospace",
-  //   fill: "#000000",
-  //   padding: { x: 20, y: 10 },
-  //   backgroundColor: "#ffffff"
-  // })
-  // .setScrollFactor(0)
-  // .setDepth(30);
 }
 
 function hitGarbage(scene,obj) {
 
  console.log('hit garbage() called')
-  
-
-  
 
   var data = {
     skills: obj.garbageCont
@@ -385,6 +364,82 @@ labels.forEach(function (label) {
   
 }
 
+function hitDump(scene, obj){
+  dialogDump = scene.rexUI.add.dialog({
+      x: obj.x,
+      y: obj.y,
+  
+      background: scene.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
+  
+      title: scene.rexUI.add.label({
+          background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
+          text: scene.add.text(0, 0, 'Welcome to Composting!', {
+              fontSize: '24px'
+          }),
+          space: {
+              left: 15,
+              right: 15,
+              top: 10,
+              bottom: 10
+          }
+      }),
+  
+      content: scene.add.text(0, 0, `Do you want to dump?\n\nCapacity: ${obj.capacity}`, {
+          fontSize: '24px'
+      }),
+  
+      actions: [
+          createLabel(scene, 'Yes'),
+          createLabel(scene, 'No')
+      ],
+  
+      space: {
+          title: 25,
+          content: 25,
+          action: 15,
+  
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: 20,
+      },
+  
+      align: {
+          actions: 'right', // 'center'|'left'|'right'
+      },
+  
+      expand: {
+          content: false, // Content is a pure text object
+      }
+  })
+      .layout()
+      // .drawBounds(scene.add.graphics(), 0xff0000)
+      .popUp(1000);
+  
+  scene.print = scene.add.text(0, 0, '');
+  dialogDump
+      .on('button.click', function (button, groupName, index) {
+        if(button.text === "Yes"){
+          var amt = Math.min(obj.capacity, gscore.biowaste);
+          gscore.biowaste -= amt;
+          obj.capacity -= amt;
+        }
+        dialogDump.scaleDownDestroy(100);
+        dialogDump = undefined;
+        if(obj.capacity === 0){
+          //loader to be added
+          obj.destroy(obj.x, obj.y); 
+        }
+      }, scene)
+      .on('button.over', function (button, groupName, index) {
+          button.getElement('background').setStrokeStyle(1, 0xffffff);
+      })
+      .on('button.out', function (button, groupName, index) {
+          button.getElement('background').setStrokeStyle();
+      });
+  
+}
+
 function checkOverlap(spriteA, spriteB) {
 
   var boundsA = spriteA.getBounds();
@@ -437,12 +492,39 @@ function update(time, delta) {
 
     let cnt=0,sz=0;
     
+    dumpZones.children.entries.forEach((obj) => {
+      var overlap = checkOverlap(player, obj);
+      
+      sz++;
+      if (!(overlap.width===0 && overlap.height===0) && dumpState==false)
+      {  
+          dumpState=true;
+          hitDump(this, obj, dialogDump);
+      }
+      else
+      {   
+        if((overlap.width===0 && overlap.height===0)) cnt++;
+
+        if(dialogDump && dumpState==false){
+          dumpState = false;
+          dialogDump.scaleDownDestroy(100);
+          dialogDump=undefined
+        }
+      }
+    })
+
+    if(cnt==sz && dumpState==true){
+      dumpState=false;
+    }
+      
+
     garbages.children.entries.forEach((obj) => {
       if(obj.garbageCont.length === 0){
         obj.destroy(obj.x, obj.y);
       }
     });
 
+    cnt = 0, sz = 0;
     garbages.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);
       
@@ -475,4 +557,10 @@ function update(time, delta) {
     
       text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

@@ -76,6 +76,116 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"Dumping",
+         "objects":[
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"Dumping",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2232.93150936085,
+                 "y":578.455679218625
+                }, 
+                {
+                 "height":0,
+                 "id":8,
+                 "name":"Dumping",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1083.53716211993,
+                 "y":2360.4206859481
+                }, 
+                {
+                 "height":0,
+                 "id":9,
+                 "name":"Dumping",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":986.632720666364,
+                 "y":193.529703444735
+                }, 
+                {
+                 "height":0,
+                 "id":10,
+                 "name":"Dumping",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1594.97726979153,
+                 "y":158.536432919836
+                }, 
+                {
+                 "height":0,
+                 "id":11,
+                 "name":"Dumping",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":406.138475020906,
+                 "y":241.446262579076
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":8,
+         "name":"Electronic",
+         "objects":[
+                {
+                 "height":0,
+                 "id":13,
+                 "name":"Electonic",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2476.52173913043,
+                 "y":876.521739130435
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":9,
+         "name":"Plastic",
+         "objects":[
+                {
+                 "height":0,
+                 "id":12,
+                 "name":"Plastic",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":55.6521739130435,
+                 "y":740.869565217391
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":6,
          "name":"Garbage",
          "objects":[
@@ -140,8 +250,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":7,
+ "nextlayerid":10,
+ "nextobjectid":14,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
