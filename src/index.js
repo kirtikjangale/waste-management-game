@@ -545,42 +545,6 @@ function hitRecycle(scene, recycleList){
     ],
   }
 
-  recyclepanel1 = scene.rexUI.add.scrollablePanel({
-    x: 400,
-    y: 300,
-    width: 400,
-    height: 220,
-
-    scrollMode: 1,
-
-    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
-
-    panel: {
-        child: createPanel(scene, recycle_panel1_data, "icon"),
-
-        mask: {
-            padding: 1
-        },
-    },
-
-    slider: {
-        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
-    },
-
-    scroller: true,
-
-    space: {
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10,
-
-        panel: 10,
-    }
-  })
-  .layout().setScrollFactor(0).setDepth(30)
-
   recyclepanel2 = scene.rexUI.add.scrollablePanel({
     x: 1000,
     y: 300,
@@ -617,22 +581,60 @@ function hitRecycle(scene, recycleList){
   })
   .layout().setScrollFactor(0).setDepth(30)
 
-  let recyclepanel1_labels = []
-  let recyclepanel2_labels = []
+
+  recyclepanel1 = scene.rexUI.add.scrollablePanel({
+    x: 400,
+    y: 300,
+    width: 400,
+    height: 220,
+
+    scrollMode: 1,
+
+    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+
+    panel: {
+        child: createPanel(scene, recycle_panel1_data, "icon"),
+
+        mask: {
+            padding: 1
+        },
+    },
+
+    slider: {
+        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+    },
+
+    scroller: true,
+
+    space: {
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10,
+
+        panel: 10,
+    }
+  })
+  .layout().setScrollFactor(0).setDepth(30)
+
+  
+
+  scene.input.topOnly = false;
+  var recyclepanel1_labels = []
+
 
   recyclepanel1_labels.push(...recyclepanel1.getElement('#skills.items', true));
-  recyclepanel2_labels.push(...recyclepanel2.getElement('#skills.items', true));
+  
 
   recyclepanel1_labels.forEach(function (label) {
     if (!label) {
         return;
     }
-    
-    // console.log(label.getElement('icon'));
+  
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
-          
-          console.log("label clicked");
+  
           scene.input.setDraggable(label)
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
               gameObject.x = dragX;
@@ -642,23 +644,15 @@ function hitRecycle(scene, recycleList){
   
           scene.input.on('drop', function (pointer, gameObject, dropZone) {
             // console.log(dropZone.name, label.getElement("icon").name);
-            // console.log(obj.garbageCont);
+
             if(dropZone.name === label.getElement("icon").name){
               // console.log("in here 1");
               gameObject.x = dropZone.x;
               gameObject.y = dropZone.y;
               gameObject.scaleDownDestroy(100);
-              const id = label.getElement("icon")._id;
-              console.log(id);
-              var amt = 0;
-              // console.log(label.getElement("icon").id);
-              obj.garbageCont = obj.garbageCont.filter((elem) => {
-                if(elem._id === id) amt = elem.amt;
-                return elem._id !== id;
-              })
-              console.log(obj.garbageCont);
-              gscore[dropZone.name] += amt;
-              console.log(gscore);
+             
+             
+             
             }else{
               // console.log("in here 2");
               gameObject.x = gameObject.input.dragStartX,
