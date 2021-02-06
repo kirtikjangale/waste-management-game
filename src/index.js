@@ -231,7 +231,7 @@ function makeBar(x, y,color,scene) {
   bar.fillStyle(color, 1);
 
   //fill the bar with a rectangle
-  bar.fillRect(0, 0, 200, 50);
+  bar.fillRect(0, 0, 100, 30);
   
   //position the bar
   bar.x = x;
@@ -476,9 +476,36 @@ function hitDump(scene, obj){
   dialogDump
       .on('button.click', function (button, groupName, index) {
         if(button.text === "Yes"){
-          var amt = Math.min(obj.capacity, gscore.biowaste);
-          gscore.biowaste -= amt;
-          obj.capacity -= amt;
+          var toast = scene.rexUI.add.toast({
+            x: obj.x,
+            y: obj.y,
+
+            background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+            text: scene.add.text(0, 0, '', {
+                fontSize: '24px'
+            }),
+            space: {
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20,
+            },
+            duration: {
+              in: 200,
+              hold: 1000,
+              out: 200
+            }
+          })
+          if(gscore.biowaste === 0){
+            toast.show("Sorry! you don't have any waste to dump!");
+          }else{
+            var amt = Math.min(obj.capacity, gscore.biowaste);
+            console.log(toast);
+            toast.displayTime = amt*100;
+            toast.show(`Dumping ${amt} of biowaste please be patient...`);
+            gscore.biowaste -= amt;
+            obj.capacity -= amt;
+          }
         }
         dialogDump.scaleDownDestroy(100);
         dialogDump = undefined;
