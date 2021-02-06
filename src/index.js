@@ -217,7 +217,35 @@ function create() {
   })
   .setScrollFactor(0)
   .setDepth(30);
+
+ powerBar=makeBar(1000,10,0xe74c3c,this);
+ 
 }
+
+function makeBar(x, y,color,scene) {
+  //draw the bar
+  let bar = scene.add.graphics();
+  bar.setScrollFactor(0).setDepth(30)
+
+  //color the bar
+  bar.fillStyle(color, 1);
+
+  //fill the bar with a rectangle
+  bar.fillRect(0, 0, 200, 50);
+  
+  //position the bar
+  bar.x = x;
+  bar.y = y;
+
+  //return the bar
+  return bar;
+}
+
+function setValue(bar,percentage) {
+  //scale the bar
+  bar.scaleX = percentage/100;
+}
+
 
 function hitGarbage(scene,obj) {
 
@@ -587,6 +615,11 @@ function update(time, delta) {
     setValue(powerBar, health);
     text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
+  setValue(powerBar,health);
+  health-=0.2
+
+  if(health<0)
+    health=100
 }
 
 function getRandomInt(min, max) {
