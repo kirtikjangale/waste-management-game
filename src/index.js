@@ -43,6 +43,8 @@ let dumpState = false;
 let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 let health = 100;
 let powerBar;
+let recyclepanel1;
+let recyclepanel2;
 //
   let text1;
   let text2;
@@ -54,7 +56,7 @@ const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
 function preload() {
-  this.load.image('preloaderBar', './assets/img/loading-bar.png');
+  this.load.image('preloaderBar', './assets/images/loading-bar.png');
   this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
    // this.load.tilemapTiledJSON("map", "./assets/tilemaps/trial.json");
   // this.load.tilemapTiledJSON("map", "./assets/tilemaps/city3.json");
@@ -73,6 +75,7 @@ function preload() {
     sceneKey: 'rexUI'
   });
   this.load.plugin('rexlifetimeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexlifetimeplugin.min.js', true);
+  this.load.image('plastic', "./assets/images/recycle-plant.png");
 }
 
 function create() {
@@ -95,7 +98,11 @@ function create() {
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
 
   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-  
+  const recyclePoint = map.findObject("Plastic", obj => obj.name === "Plastic");
+
+  const recyclePlant = this.physics.add.sprite(recyclePoint.x, recyclePoint.y, "plastic");
+  recyclePlant.scaleX = 0.15;
+  recyclePlant.scaleY = 0.15;
 
   player = this.physics.add
     .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
@@ -521,6 +528,9 @@ function hitDump(scene, obj){
           button.getElement('background').setStrokeStyle();
       });
   
+}
+
+function hitRecycle(){
 }
 
 function checkOverlap(spriteA, spriteB) {
