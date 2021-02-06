@@ -17,24 +17,8 @@ const wastes = [
     }
 ]
 
-const recycleList = [
-    {
-        name: "Inspection",
-        image: "garbage",
-        id: 1
-    },{
-        name: "Melting",
-        image: "garbage",
-        id: 2
-    },{
-        name: "Seperation",
-        image: "garbage",
-        id: 3
-    },{
-        name: "Pelleting",
-        image: "garbage",
-        id: 4
-    }
+const recycleFacts = [
+    "Fact1", "Fact2", "Fact3", "Fact4", "Fact5"
 ]
 
-module.exports = {wastes, recycleList}
+module.exports = {wastes, recycleFacts}

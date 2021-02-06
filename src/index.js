@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
-import {wastes, recycleList} from './store'
+import {wastes, recycleFacts} from './store'
 import createLabel from './ui-elements/create-dump'
 
 const config = {
@@ -41,10 +41,9 @@ let dumpState = false;
 let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 let health = 100;
 let powerBar;
-let recyclepanel1;
-let recyclepanel2;
 let overlapRecyclePlant=false;
 let recyclePlant;
+let dialogRecycle;
 //
   let text1;
   let text2;
@@ -250,6 +249,7 @@ function makeBar(x, y,color,scene) {
 
 function setValue(bar,percentage) {
   //scale the bar
+  console.log("here baby");
   bar.scaleX = percentage/100;
 }
 
@@ -370,6 +370,7 @@ labels.forEach(function (label) {
           console.log(obj.garbageCont);
           if(dropZone.name === label.getElement("icon").name){
             // console.log("in here 1");
+            health -= 1;
             gameObject.x = dropZone.x;
             gameObject.y = dropZone.y;
             gameObject.scaleDownDestroy(100);
@@ -385,6 +386,7 @@ labels.forEach(function (label) {
             gscore[dropZone.name] += amt;
             console.log(gscore);
           }else{
+            health -= 2;
             // console.log("in here 2");
             gameObject.x = gameObject.input.dragStartX,
             gameObject.y = gameObject.input.dragStartY
@@ -512,6 +514,7 @@ function hitDump(scene, obj){
             toast.show(`Dumping ${amt} of biowaste please be patient...`);
             gscore.biowaste -= amt;
             obj.capacity -= amt;
+            health = min(health+5, 100);
           }
         }
         dialogDump.scaleDownDestroy(100);
@@ -530,145 +533,101 @@ function hitDump(scene, obj){
   
 }
 
-function hitRecycle(scene, recycleList){
+function hitRecycle(scene, recycleFacts, obj){
   
-  var recycle_panel1_data = {
-    skills: recycleList,
-  }
+  dialogRecycle = scene.rexUI.add.dialog({
+    x: obj.x,
+    y: obj.y,
 
-  var recycle_panel2_data = {
-    skills: [
-      { name: '1' },
-      { name: '2' },
-      { name: '3' },
-      { name: '4' }
+    background: scene.rexUI.add.roundRectangle(0, 0, 100, 100, 20, 0x1565c0),
+
+    title: scene.rexUI.add.label({
+        background: scene.rexUI.add.roundRectangle(0, 0, 100, 40, 20, 0x003c8f),
+        text: scene.add.text(0, 0, 'Welcome to Recycling!', {
+            fontSize: '24px'
+        }),
+        space: {
+            left: 15,
+            right: 15,
+            top: 10,
+            bottom: 10
+        }
+    }),
+
+    content: scene.add.text(0, 0, `Do you want to dump?\n\n`, {
+        fontSize: '24px'
+    }),
+
+    actions: [
+        createLabel(scene, 'Yes'),
+        createLabel(scene, 'No')
     ],
-  }
-
-  recyclepanel2 = scene.rexUI.add.scrollablePanel({
-    x: 1000,
-    y: 300,
-    width: 400,
-    height: 220,
-
-    scrollMode: 1,
-
-    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
-
-    panel: {
-        child: createPanel(scene, recycle_panel2_data, "dropzone"),
-
-        mask: {
-            padding: 1
-        },
-    },
-
-    slider: {
-        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
-    },
-
-    scroller: true,
 
     space: {
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10,
+        title: 25,
+        content: 25,
+        action: 15,
 
-        panel: 10,
-    }
-  })
-  .layout().setScrollFactor(0).setDepth(30)
-
-
-  recyclepanel1 = scene.rexUI.add.scrollablePanel({
-    x: 400,
-    y: 300,
-    width: 400,
-    height: 220,
-
-    scrollMode: 1,
-
-    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
-
-    panel: {
-        child: createPanel(scene, recycle_panel1_data, "icon"),
-
-        mask: {
-            padding: 1
-        },
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: 20,
     },
 
-    slider: {
-        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+    align: {
+        actions: 'right', // 'center'|'left'|'right'
     },
 
-    scroller: true,
-
-    space: {
-        left: 10,
-        right: 10,
-        top: 10,
-        bottom: 10,
-
-        panel: 10,
+    expand: {
+        content: false, // Content is a pure text object
     }
-  })
-  .layout().setScrollFactor(0).setDepth(30)
+})
+    .layout()
+    // .drawBounds(scene.add.graphics(), 0xff0000)
+    .popUp(1000);
 
-  
+scene.print = scene.add.text(0, 0, '');
+dialogRecycle
+    .on('button.click', function (button, groupName, index) {
+      if(button.text === "Yes"){
+        var toast = scene.rexUI.add.toast({
+          x: obj.x,
+          y: obj.y,
 
-  scene.input.topOnly = false;
-  var recyclepanel1_labels = []
-
-
-  recyclepanel1_labels.push(...recyclepanel1.getElement('#skills.items', true));
-  
-
-  recyclepanel1_labels.forEach(function (label) {
-    if (!label) {
-        return;
-    }
-  
-    var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
-        .on('click', function () {
-  
-          scene.input.setDraggable(label)
-          scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-              gameObject.x = dragX;
-              gameObject.y = dragY;
-          
-          });
-  
-          scene.input.on('drop', function (pointer, gameObject, dropZone) {
-            // console.log(dropZone.name, label.getElement("icon").name);
-
-            if(dropZone.name === label.getElement("icon").name){
-              // console.log("in here 1");
-              gameObject.x = dropZone.x;
-              gameObject.y = dropZone.y;
-              gameObject.scaleDownDestroy(100);
-             
-             
-             
-            }else{
-              // console.log("in here 2");
-              gameObject.x = gameObject.input.dragStartX,
-              gameObject.y = gameObject.input.dragStartY
-            }
-  
-          });
-  
-          if (!label.getTopmostSizer().isInTouching()) {
-              return;
+          background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+          text: scene.add.text(0, 0, '', {
+              fontSize: '24px'
+          }),
+          space: {
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: 20,
+          },
+          duration: {
+            in: 200,
+            hold: 3000+100*gscore.packaging,
+            out: 200
           }
-  
-          var category = label.getParentSizer().name;
-          //console.log(`${category}:${label.text}\n`)
-        });
+        })
+        if(gscore.packaging+gscore.ewaste === 0){
+          toast.show("Sorry! you don't have any waste to dump!");
+        }else{
+          health = min(health+10, 100);
+          toast.show(`Dumping ${gscore.packaging+gscore.ewaste} amount of packaging waste please be patient...`);
+          gscore.packaging = 0;
+          gscore.waste = 0;
+        }
+      }
+      dialogRecycle.scaleDownDestroy(100);
+      dialogRecycle = undefined;
+    }, scene)
+    .on('button.over', function (button, groupName, index) {
+        button.getElement('background').setStrokeStyle(1, 0xffffff);
     })
+    .on('button.out', function (button, groupName, index) {
+        button.getElement('background').setStrokeStyle();
+    });
   
 }
 
@@ -706,12 +665,16 @@ function update(time, delta) {
 
   // Update the animation last and give left/right animations precedence over up/down animations
   if (cursors.left.isDown) {
+    health -= 0.01;
     player.anims.play("misa-left-walk", true);
   } else if (cursors.right.isDown) {
+    health -= 0.01;
     player.anims.play("misa-right-walk", true);
   } else if (cursors.up.isDown) {
+    health -= 0.01;
     player.anims.play("misa-back-walk", true);
   } else if (cursors.down.isDown) {
+    health -= 0.01;
     player.anims.play("misa-front-walk", true);
   } else {
     player.anims.stop();
@@ -729,19 +692,14 @@ function update(time, delta) {
     if (!(overlap.width===0 && overlap.height===0) && overlapRecyclePlant==false)
     {  
         overlapRecyclePlant=true;
-        hitRecycle(this, recycleList);  //obj to be changed
+        hitRecycle(this, recycleFacts, recyclePlant);  //obj to be changed
     }
     else{
       if((overlap.width===0 && overlap.height===0)){
         overlapRecyclePlant = false;
-
-        if(recyclepanel1){
-          recyclepanel1.scaleDownDestroy(1)
-          recyclepanel1=undefined
-        }
-        if(recyclepanel2){
-          recyclepanel2.scaleDownDestroy(1)
-          recyclepanel2=undefined
+        if(dialogRecycle) {
+          dialogRecycle.scaleDownDestroy(100);
+          dialogRecycle = undefined;
         }
       } 
      
