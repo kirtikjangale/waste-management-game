@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
 import wastes from './store'
 import createLabel from './ui-elements/create-dump'
+import createNumberBar from './temporary'
+import LifeTimePlugin from 'phaser3-rex-plugins/plugins/lifetime-plugin.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -39,7 +41,8 @@ let dumpZones;
 let overlapState=false;
 let dumpState = false;
 let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
-
+let health = 100;
+let powerBar;
 //
   let text1;
   let text2;
@@ -51,6 +54,7 @@ const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
 function preload() {
+  this.load.image('preloaderBar', './assets/img/loading-bar.png');
   this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
    // this.load.tilemapTiledJSON("map", "./assets/tilemaps/trial.json");
   // this.load.tilemapTiledJSON("map", "./assets/tilemaps/city3.json");
@@ -68,6 +72,7 @@ function preload() {
     url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
     sceneKey: 'rexUI'
   });
+  this.load.plugin('rexlifetimeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexlifetimeplugin.min.js', true);
 }
 
 function create() {
@@ -81,7 +86,6 @@ function create() {
   garbageLayer = map.getObjectLayer("Garbage")['objects']
   dumpingLayer = map.getObjectLayer("Dumping")['objects']
   worldLayer.setCollisionByProperty({ collides: true });
-
   // // By default, everything gets depth sorted on the screen in the order we created things. Here, we
   // // want the "Above Player" layer to sit on top of the player, so we explicitly give it a depth.
   // // Higher depths will sit on top of lower depth objects.
@@ -98,7 +102,7 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
-  
+  // var lifeTime = this.plugins.get('rexLifeTime').add(gameObject, config);
   garbages = this.physics.add.staticGroup();
   garbageLayer.forEach(object => {
     var _id = 0;
@@ -133,7 +137,7 @@ function create() {
     obj.capacity = getRandomInt(30,60);
   })
 
-  this.physics.add.collider(player, worldLayer);
+  powerBar=makeBar(1000,10,0xe74c3c,this);
 
   const anims = this.anims;
   anims.create({
@@ -364,6 +368,30 @@ labels.forEach(function (label) {
   
 }
 
+function makeBar(x, y,color,scene) {
+  //draw the bar
+  let bar = scene.add.graphics();
+  bar.setScrollFactor(0).setDepth(30)
+
+  //color the bar
+  bar.fillStyle(color, 1);
+
+  //fill the bar with a rectangle
+  bar.fillRect(0, 0, 200, 50);
+  
+  //position the bar
+  bar.x = x;
+  bar.y = y;
+
+  //return the bar
+  return bar;
+}
+
+function setValue(bar,percentage) {
+  //scale the bar
+  bar.scaleX = percentage/100;
+}
+
 function hitDump(scene, obj){
   dialogDump = scene.rexUI.add.dialog({
       x: obj.x,
@@ -555,7 +583,9 @@ function update(time, delta) {
     if(cnt==sz && overlapState==true)
       overlapState=false;
     
-      text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
+    
+    setValue(powerBar, health);
+    text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
 }
 
