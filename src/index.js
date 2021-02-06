@@ -1,9 +1,7 @@
 import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
-import wastes from './store'
+import {wastes, recycleList} from './store'
 import createLabel from './ui-elements/create-dump'
-
-
 
 const config = {
   type: Phaser.AUTO,
@@ -532,15 +530,10 @@ function hitDump(scene, obj){
   
 }
 
-function hitRecycle(scene){
+function hitRecycle(scene, recycleList){
   
   var recycle_panel1_data = {
-    skills: [
-      { name: '1' },
-      { name: '2' },
-      { name: '3' },
-      { name: '4'},
-    ],
+    skills: recycleList,
   }
 
   var recycle_panel2_data = {
@@ -548,7 +541,7 @@ function hitRecycle(scene){
       { name: '1' },
       { name: '2' },
       { name: '3' },
-      { name: '4'},
+      { name: '4' }
     ],
   }
 
@@ -563,7 +556,7 @@ function hitRecycle(scene){
     background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
 
     panel: {
-        child: createPanel(scene, recycle_panel1_data, "dropzone"),
+        child: createPanel(scene, recycle_panel1_data, "icon"),
 
         mask: {
             padding: 1
@@ -634,10 +627,12 @@ function hitRecycle(scene){
     if (!label) {
         return;
     }
-  
+    
+    // console.log(label.getElement('icon'));
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
-  
+          
+          console.log("label clicked");
           scene.input.setDraggable(label)
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
               gameObject.x = dragX;
@@ -647,58 +642,7 @@ function hitRecycle(scene){
   
           scene.input.on('drop', function (pointer, gameObject, dropZone) {
             // console.log(dropZone.name, label.getElement("icon").name);
-            console.log(obj.garbageCont);
-            if(dropZone.name === label.getElement("icon").name){
-              // console.log("in here 1");
-              gameObject.x = dropZone.x;
-              gameObject.y = dropZone.y;
-              gameObject.scaleDownDestroy(100);
-              const id = label.getElement("icon")._id;
-              console.log(id);
-              var amt = 0;
-              // console.log(label.getElement("icon").id);
-              obj.garbageCont = obj.garbageCont.filter((elem) => {
-                if(elem._id === id) amt = elem.amt;
-                return elem._id !== id;
-              })
-              console.log(obj.garbageCont);
-              gscore[dropZone.name] += amt;
-              console.log(gscore);
-            }else{
-              // console.log("in here 2");
-              gameObject.x = gameObject.input.dragStartX,
-              gameObject.y = gameObject.input.dragStartY
-            }
-  
-          });
-  
-          if (!label.getTopmostSizer().isInTouching()) {
-              return;
-          }
-  
-          var category = label.getParentSizer().name;
-          //console.log(`${category}:${label.text}\n`)
-        });
-    })
-
-  recyclepanel2_labels.forEach(function (label) {
-    if (!label) {
-        return;
-    }
-  
-    var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
-        .on('click', function () {
-  
-          scene.input.setDraggable(label)
-          scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-              gameObject.x = dragX;
-              gameObject.y = dragY;
-          
-          });
-  
-          scene.input.on('drop', function (pointer, gameObject, dropZone) {
-            // console.log(dropZone.name, label.getElement("icon").name);
-            console.log(obj.garbageCont);
+            // console.log(obj.garbageCont);
             if(dropZone.name === label.getElement("icon").name){
               // console.log("in here 1");
               gameObject.x = dropZone.x;
@@ -791,23 +735,24 @@ function update(time, delta) {
     if (!(overlap.width===0 && overlap.height===0) && overlapRecyclePlant==false)
     {  
         overlapRecyclePlant=true;
-        hitRecycle(this);  //obj to be changed
+        hitRecycle(this, recycleList);  //obj to be changed
     }
     else{
-      overlapRecyclePlant=false
+      if((overlap.width===0 && overlap.height===0)){
+        overlapRecyclePlant = false;
 
-      if(recyclepanel1){
-        recyclepanel1.scaleDownDestroy(1)
-        recyclepanel1=undefined
-      }
-      if(recyclepanel2){
-        recyclepanel2.scaleDownDestroy(1)
-        recyclepanel2=undefined
-      }
+        if(recyclepanel1){
+          recyclepanel1.scaleDownDestroy(1)
+          recyclepanel1=undefined
+        }
+        if(recyclepanel2){
+          recyclepanel2.scaleDownDestroy(1)
+          recyclepanel2=undefined
+        }
+      } 
      
     }
 
-    //console.log(recyclePlant)
     
     dumpZones.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);

@@ -17,4 +17,24 @@ const wastes = [
     }
 ]
 
-module.exports = wastes
+const recycleList = [
+    {
+        name: "Inspection",
+        image: "garbage",
+        id: 1
+    },{
+        name: "Melting",
+        image: "garbage",
+        id: 2
+    },{
+        name: "Seperation",
+        image: "garbage",
+        id: 3
+    },{
+        name: "Pelleting",
+        image: "garbage",
+        id: 4
+    }
+]
+
+module.exports = {wastes, recycleList}
