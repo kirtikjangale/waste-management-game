@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 import createPanel from '../src/ui-elements/create-table'
 import wastes from './store'
 import createLabel from './ui-elements/create-dump'
-import createNumberBar from './temporary'
-import LifeTimePlugin from 'phaser3-rex-plugins/plugins/lifetime-plugin.js';
+
+
 
 const config = {
   type: Phaser.AUTO,
@@ -45,6 +45,8 @@ let health = 100;
 let powerBar;
 let recyclepanel1;
 let recyclepanel2;
+let overlapRecyclePlant=false;
+let recyclePlant;
 //
   let text1;
   let text2;
@@ -74,7 +76,7 @@ function preload() {
     url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
     sceneKey: 'rexUI'
   });
-  this.load.plugin('rexlifetimeplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexlifetimeplugin.min.js', true);
+  
   this.load.image('plastic', "./assets/images/recycle-plant.png");
 }
 
@@ -100,7 +102,7 @@ function create() {
   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
   const recyclePoint = map.findObject("Plastic", obj => obj.name === "Plastic");
 
-  const recyclePlant = this.physics.add.sprite(recyclePoint.x, recyclePoint.y, "plastic");
+  recyclePlant = this.physics.add.sprite(recyclePoint.x, recyclePoint.y, "plastic");
   recyclePlant.scaleX = 0.15;
   recyclePlant.scaleY = 0.15;
 
@@ -530,7 +532,206 @@ function hitDump(scene, obj){
   
 }
 
-function hitRecycle(){
+function hitRecycle(scene){
+  
+  var recycle_panel1_data = {
+    skills: [
+      { name: '1' },
+      { name: '2' },
+      { name: '3' },
+      { name: '4'},
+    ],
+  }
+
+  var recycle_panel2_data = {
+    skills: [
+      { name: '1' },
+      { name: '2' },
+      { name: '3' },
+      { name: '4'},
+    ],
+  }
+
+  recyclepanel1 = scene.rexUI.add.scrollablePanel({
+    x: 400,
+    y: 300,
+    width: 400,
+    height: 220,
+
+    scrollMode: 1,
+
+    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+
+    panel: {
+        child: createPanel(scene, recycle_panel1_data, "dropzone"),
+
+        mask: {
+            padding: 1
+        },
+    },
+
+    slider: {
+        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+    },
+
+    scroller: true,
+
+    space: {
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10,
+
+        panel: 10,
+    }
+  })
+  .layout().setScrollFactor(0).setDepth(30)
+
+  recyclepanel2 = scene.rexUI.add.scrollablePanel({
+    x: 1000,
+    y: 300,
+    width: 400,
+    height: 220,
+
+    scrollMode: 1,
+
+    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 10, COLOR_PRIMARY),
+
+    panel: {
+        child: createPanel(scene, recycle_panel2_data, "dropzone"),
+
+        mask: {
+            padding: 1
+        },
+    },
+
+    slider: {
+        track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+        thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+    },
+
+    scroller: true,
+
+    space: {
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10,
+
+        panel: 10,
+    }
+  })
+  .layout().setScrollFactor(0).setDepth(30)
+
+  let recyclepanel1_labels = []
+  let recyclepanel2_labels = []
+
+  recyclepanel1_labels.push(...recyclepanel1.getElement('#skills.items', true));
+  recyclepanel2_labels.push(...recyclepanel2.getElement('#skills.items', true));
+
+  recyclepanel1_labels.forEach(function (label) {
+    if (!label) {
+        return;
+    }
+  
+    var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
+        .on('click', function () {
+  
+          scene.input.setDraggable(label)
+          scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+              gameObject.x = dragX;
+              gameObject.y = dragY;
+          
+          });
+  
+          scene.input.on('drop', function (pointer, gameObject, dropZone) {
+            // console.log(dropZone.name, label.getElement("icon").name);
+            console.log(obj.garbageCont);
+            if(dropZone.name === label.getElement("icon").name){
+              // console.log("in here 1");
+              gameObject.x = dropZone.x;
+              gameObject.y = dropZone.y;
+              gameObject.scaleDownDestroy(100);
+              const id = label.getElement("icon")._id;
+              console.log(id);
+              var amt = 0;
+              // console.log(label.getElement("icon").id);
+              obj.garbageCont = obj.garbageCont.filter((elem) => {
+                if(elem._id === id) amt = elem.amt;
+                return elem._id !== id;
+              })
+              console.log(obj.garbageCont);
+              gscore[dropZone.name] += amt;
+              console.log(gscore);
+            }else{
+              // console.log("in here 2");
+              gameObject.x = gameObject.input.dragStartX,
+              gameObject.y = gameObject.input.dragStartY
+            }
+  
+          });
+  
+          if (!label.getTopmostSizer().isInTouching()) {
+              return;
+          }
+  
+          var category = label.getParentSizer().name;
+          //console.log(`${category}:${label.text}\n`)
+        });
+    })
+
+  recyclepanel2_labels.forEach(function (label) {
+    if (!label) {
+        return;
+    }
+  
+    var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
+        .on('click', function () {
+  
+          scene.input.setDraggable(label)
+          scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+              gameObject.x = dragX;
+              gameObject.y = dragY;
+          
+          });
+  
+          scene.input.on('drop', function (pointer, gameObject, dropZone) {
+            // console.log(dropZone.name, label.getElement("icon").name);
+            console.log(obj.garbageCont);
+            if(dropZone.name === label.getElement("icon").name){
+              // console.log("in here 1");
+              gameObject.x = dropZone.x;
+              gameObject.y = dropZone.y;
+              gameObject.scaleDownDestroy(100);
+              const id = label.getElement("icon")._id;
+              console.log(id);
+              var amt = 0;
+              // console.log(label.getElement("icon").id);
+              obj.garbageCont = obj.garbageCont.filter((elem) => {
+                if(elem._id === id) amt = elem.amt;
+                return elem._id !== id;
+              })
+              console.log(obj.garbageCont);
+              gscore[dropZone.name] += amt;
+              console.log(gscore);
+            }else{
+              // console.log("in here 2");
+              gameObject.x = gameObject.input.dragStartX,
+              gameObject.y = gameObject.input.dragStartY
+            }
+  
+          });
+  
+          if (!label.getTopmostSizer().isInTouching()) {
+              return;
+          }
+  
+          var category = label.getParentSizer().name;
+          //console.log(`${category}:${label.text}\n`)
+        });
+    })
+  
 }
 
 function checkOverlap(spriteA, spriteB) {
@@ -584,6 +785,29 @@ function update(time, delta) {
     else if (prevVelocity.y > 0) player.setTexture("atlas", "misa-front");
 
     let cnt=0,sz=0;
+
+    var overlap = checkOverlap(player,recyclePlant);
+
+    if (!(overlap.width===0 && overlap.height===0) && overlapRecyclePlant==false)
+    {  
+        overlapRecyclePlant=true;
+        hitRecycle(this);  //obj to be changed
+    }
+    else{
+      overlapRecyclePlant=false
+
+      if(recyclepanel1){
+        recyclepanel1.scaleDownDestroy(1)
+        recyclepanel1=undefined
+      }
+      if(recyclepanel2){
+        recyclepanel2.scaleDownDestroy(1)
+        recyclepanel2=undefined
+      }
+     
+    }
+
+    //console.log(recyclePlant)
     
     dumpZones.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);
