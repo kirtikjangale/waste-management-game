@@ -73,7 +73,6 @@ function preload() {
     url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
     sceneKey: 'rexUI'
   });
-  
   this.load.image('plastic', "./assets/images/recycle-plant.png");
 }
 
@@ -108,6 +107,7 @@ function create() {
     .setSize(30, 40)
     .setOffset(0, 24);
 
+  this.physics.add.collider(player, worldLayer);
   // var lifeTime = this.plugins.get('rexLifeTime').add(gameObject, config);
   garbages = this.physics.add.staticGroup();
   garbageLayer.forEach(object => {
@@ -770,11 +770,13 @@ function update(time, delta) {
       overlapState=false;
     
     
-    setValue(powerBar, health);
+   
     text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
+
+  
   setValue(powerBar,health);
-  health-=0.2
+  
 
   if(health<0)
     health=100
