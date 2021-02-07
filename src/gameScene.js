@@ -160,7 +160,7 @@ class GameScene extends Phaser.Scene {
         var accessibility = this.rexUI.add.buttons({
             x: 1300, y: 40,
             width: 200,
-            orientation: 'x',
+            orientation: 'y',
 
             buttons: [
                 this.createButton(this, 'Pause'),
@@ -170,12 +170,12 @@ class GameScene extends Phaser.Scene {
             ],
 
             space: {
-                left: 10, right: 10, top: 10, bottom: 10, 
+                left: 10, right: 10, top: 180, bottom: 30, 
                 item: 3
             },
             expand: expand
         })
-            .layout()
+            .layout().setScrollFactor(0).setDepth(30)
             // .drawBounds(this.add.graphics(), 0xff0000)
 
         accessibility
@@ -192,13 +192,14 @@ class GameScene extends Phaser.Scene {
         return scene.rexUI.add.label({
             width: 40,
             height: 40,
-            background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, COLOR_LIGHT),
+            background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, COLOR_LIGHT).setScrollFactor(0).setDepth(30),
             text: scene.add.text(0, 0, text, {
                 fontSize: 18
-            }),
+            }).setScrollFactor(0).setDepth(30),
             space: {
                 left: 10,
                 right: 10,
+                
             },
             align: 'center'
         }).setScrollFactor(0).setDepth(30);
