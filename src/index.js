@@ -40,7 +40,7 @@ let overlapState=false;
 let dumpState = false;
 let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 let health = 100;
-let powerBar;
+let Bar;
 let overlapRecyclePlant=false;
 let recyclePlant;
 let dialogRecycle;
@@ -143,7 +143,7 @@ function create() {
     obj.capacity = getRandomInt(30,60);
   })
 
-  powerBar=makeBar(1000,10,0xe74c3c,this);
+  Bar = makeBar(1000,10,0xe74c3c,this);
 
   const anims = this.anims;
   anims.create({
@@ -223,8 +223,6 @@ function create() {
   })
   .setScrollFactor(0)
   .setDepth(30);
-
- powerBar=makeBar(1000,10,0xe74c3c,this);
  
 }
 
@@ -247,12 +245,11 @@ function makeBar(x, y,color,scene) {
   return bar;
 }
 
-function setValue(bar,percentage) {
+function setValue(bar, percentage) {
   //scale the bar
   console.log("here baby");
   bar.scaleX = percentage/100;
 }
-
 
 function hitGarbage(scene,obj) {
 
@@ -426,7 +423,7 @@ function makeBar(x, y,color,scene) {
 
 function setValue(bar,percentage) {
   //scale the bar
-  bar.scaleX = percentage/100;
+  bar.scaleX = health/100;
 }
 
 function hitDump(scene, obj){
@@ -769,15 +766,16 @@ function update(time, delta) {
     if(cnt==sz && overlapState==true)
       overlapState=false;
     
-    
-    setValue(powerBar, health);
     text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
   }
-  setValue(powerBar,health);
-  health-=0.2
+  
+  setValue(Bar, health);
 
-  if(health<0)
-    health=100
+  if(health<0){
+    health = 100;
+    console.log("game over!");
+  }
+    
 }
 
 function getRandomInt(min, max) {
