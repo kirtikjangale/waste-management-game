@@ -34,6 +34,7 @@ let dropzonepanel;
 let dialogDump;  
 let garbageLayer;    
 let dumpingLayer;
+let recycleLayer;
 let garbages;
 let dumpZones;
 let overlapState=false;
@@ -42,7 +43,7 @@ let gscore = {packaging: 0, ewaste: 0, biowaste: 0}
 let health = 100;
 let Bar;
 let overlapRecyclePlant=false;
-let recyclePlant;
+let recyclePlants;
 let dialogRecycle;
 //
   let text1;
@@ -87,6 +88,8 @@ function create() {
   const aboveLayer = map.createStaticLayer("Above Player", tileset, 0, 0);
   garbageLayer = map.getObjectLayer("Garbage")['objects']
   dumpingLayer = map.getObjectLayer("Dumping")['objects']
+  recycleLayer = map.getObjectLayer("Plastic")['objects']
+
   worldLayer.setCollisionByProperty({ collides: true });
   // // By default, everything gets depth sorted on the screen in the order we created things. Here, we
   // // want the "Above Player" layer to sit on top of the player, so we explicitly give it a depth.
@@ -97,11 +100,11 @@ function create() {
   // // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
 
   const spawnPoint = map.findObject("Objects", obj => obj.name === "Spawn Point");
-  const recyclePoint = map.findObject("Plastic", obj => obj.name === "Plastic");
+  // const recyclePoint = map.findObject("Plastic", obj => obj.name === "Plastic");
 
-  recyclePlant = this.physics.add.sprite(recyclePoint.x, recyclePoint.y, "plastic");
-  recyclePlant.scaleX = 0.15;
-  recyclePlant.scaleY = 0.15;
+  // recyclePlant = this.physics.add.sprite(recyclePoint.x, recyclePoint.y, "plastic");
+  // recyclePlant.scaleX = 0.15;
+  // recyclePlant.scaleY = 0.15;
 
   player = this.physics.add
     .sprite(spawnPoint.x, spawnPoint.y, "atlas", "misa-front")
@@ -132,6 +135,7 @@ function create() {
       obj.garbageCont = arr;
   })
 
+
   dumpZones = this.physics.add.staticGroup();
   dumpingLayer.forEach(object => {
     let obj = dumpZones.create(object.x, object.y, "dumping");
@@ -141,6 +145,16 @@ function create() {
     obj.body.width = object.width; 
     obj.body.height = object.height; 
     obj.capacity = getRandomInt(30,60);
+  })
+
+  recyclePlants = this.physics.add.staticGroup();
+  recycleLayer.forEach(object => {
+    let obj = recyclePlants.create(object.x, object.y, "plastic");
+    obj.scaleX = 0.3;
+    obj.scaleY = 0.3;
+    obj.setOrigin(0);
+    obj.body.width = object.width;
+    obj.body.height = object.height;
   })
 
   Bar = makeBar(1000,10,0xe74c3c,this);
@@ -684,25 +698,32 @@ function update(time, delta) {
 
     let cnt=0,sz=0;
 
-    var overlap = checkOverlap(player,recyclePlant);
+    recyclePlants.children.entries.forEach((obj) => {
+      var overlap = checkOverlap(player,obj);
 
-    if (!(overlap.width===0 && overlap.height===0) && overlapRecyclePlant==false)
-    {  
-        overlapRecyclePlant=true;
-        hitRecycle(this, recycleFacts, recyclePlant);  //obj to be changed
-    }
-    else{
-      if((overlap.width===0 && overlap.height===0)){
-        overlapRecyclePlant = false;
-        if(dialogRecycle) {
+      sz++;
+      if (!(overlap.width===0 && overlap.height===0) && overlapRecyclePlant==false)
+      {  
+          overlapRecyclePlant=true;
+          hitRecycle(this, recycleFacts, obj);  //obj to be changed
+      }
+      else{
+        if((overlap.width===0 && overlap.height===0)) cnt++
+        
+        if(dialogRecycle && overlapRecyclePlant==false){
+          overlapRecyclePlant = false;          
           dialogRecycle.scaleDownDestroy(100);
           dialogRecycle = undefined;
-        }
-      } 
-     
+        } 
+      
+      }
+    })
+    
+    if(cnt==sz && overlapRecyclePlant==true){
+      overlapRecyclePlant=false;
     }
 
-    
+    cnt = 0, sz = 0;
     dumpZones.children.entries.forEach((obj) => {
       var overlap = checkOverlap(player, obj);
       
