@@ -75,6 +75,10 @@ function preload() {
     sceneKey: 'rexUI'
   });
   this.load.image('plastic', "./assets/images/recycle-plant.png");
+  this.load.image('garbage1', "./assets/images/garbage1.png");
+  this.load.image('garbage2', "./assets/images/garbage2.png");
+  this.load.image('garbage3', "./assets/images/garbage3.png");
+  this.load.image('garbage4', "./assets/images/garbage4.png");
 }
 
 function create() {
@@ -115,7 +119,7 @@ function create() {
   garbages = this.physics.add.staticGroup();
   garbageLayer.forEach(object => {
     var _id = 0;
-    let obj = garbages.create(object.x, object.y, "garbage"); 
+    let obj = garbages.create(object.x, object.y, "garbage4"); 
        obj.scaleX = 0.3;
        obj.scaleY = 0.3;
        obj.setOrigin(0); 
@@ -229,7 +233,17 @@ function create() {
   });
 
   text1 = this.add
-  .text(16, 16, 'Arrow keys to move\nScore:0', {
+  .text(16, 16, 'Arrow keys to move\n', {
+    font: "18px monospace",
+    fill: "#000000",
+    padding: { x: 20, y: 10 },
+    backgroundColor: "#ffffff"
+  })
+  .setScrollFactor(0)
+  .setDepth(30);
+
+  text2 = this.add
+  .text(800, 10, 'Arrow keys to move\n', {
     font: "18px monospace",
     fill: "#000000",
     padding: { x: 20, y: 10 },
@@ -690,6 +704,7 @@ function update(time, delta) {
     health -= 0.01;
     player.anims.play("misa-front-walk", true);
   } else {
+    health -= 0.01;
     player.anims.stop();
 
     // If we were moving, pick and idle frame to use
@@ -790,13 +805,12 @@ function update(time, delta) {
       overlapState=false;
     
     text1.setText(`Packaging Waste:${gscore.packaging}\nE-Waste:${gscore.ewaste}\nBio-waste:${gscore.biowaste}`);
+    text2.setText(`health: ${health.toFixed(2)}`)
   }
-  
   setValue(Bar, health);
 
   if(health<0){
     health = 100;
-    console.log("game over!");
   }
     
 }
