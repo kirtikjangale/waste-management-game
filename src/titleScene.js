@@ -22,19 +22,13 @@ class TitleScene extends Phaser.Scene {
     }
 
     create() {
-        createTextBox(this, 100, 100, {
-                wrapWidth: 500,
+        createTextBox(this, 100, 200, {
+                wrapWidth: 1000,
             })
-            .start(content, 50);
+            .start(content, 60);
 
-        createTextBox(this, 100, 400, {
-                wrapWidth: 500,
-                fixedWidth: 500,
-                fixedHeight: 65,
-            })
-            .start(content, 50);
-
-        var text = this.add.text(500, 500, 'Welcome to my game!');
+        
+        var text = this.add.text(600, 500, 'Click here to play!');
         text.setInteractive({ useHandCursor: true });
         text.on('pointerdown', () => this.clickButton());
 

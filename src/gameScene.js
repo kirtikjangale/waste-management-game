@@ -41,7 +41,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
         this.load.tilemapTiledJSON("map", "./assets/tilemaps/map6.json");
         this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
-        this.load.image("garbage", "./assets/images/garbage.png");
+        this.load.image("garbage", "./assets/images/garbage1.png");
         this.load.image("dumping", "./assets/images/dumping.png");
         this.load.scenePlugin({
           key: 'rexuiplugin',
@@ -123,7 +123,7 @@ class GameScene extends Phaser.Scene {
           obj.setOrigin(0);
           obj.body.width = object.width; 
           obj.body.height = object.height; 
-          obj.capacity = getRandomInt(30,60);
+          obj.capacity = getRandomInt(30,300);
         })
       
         recyclePlants = this.physics.add.staticGroup();
@@ -654,7 +654,7 @@ function makeBar(x, y,color,scene) {
               toast.show(`Dumping ${amt} of biowaste please be patient...`);
               gscore.biowaste -= amt;
               obj.capacity -= amt;
-              health = min(health+5, 100);
+              health = Math.min(health+10, 100);
             }
           }
           dialogDump.scaleDownDestroy(100);
@@ -748,7 +748,7 @@ function makeBar(x, y,color,scene) {
             },
             duration: {
               in: 200,
-              hold: 3000+100*gscore.packaging,
+              hold: Math.min(3000+100*gscore.packaging,5000),
               out: 200
             }
           })
@@ -756,9 +756,9 @@ function makeBar(x, y,color,scene) {
             toast.show("Sorry! you don't have any waste to dump!");
           }else{
             health = Math.min(health+10, 100);
-            toast.show(`Dumping ${gscore.packaging+gscore.ewaste} amount of packaging waste please be patient...`);
+            toast.show(` ${gscore.packaging+gscore.ewaste} amount of packaging/ewaste is in the process of recycling please be patient...`);
             gscore.packaging = 0;
-            gscore.waste = 0;
+            gscore.ewaste = 0;
           }
         }
         dialogRecycle.scaleDownDestroy(100);
