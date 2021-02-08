@@ -3,7 +3,6 @@ import createPanel from '../src/ui-elements/create-table'
 import {wastes, recycleFacts} from './store'
 import createLabel from './ui-elements/create-dump'
 import createAnims from './ui-elements/create-anims'
-import TitleScene from './titleScene'
 
 let cursors;
 let player;
@@ -57,7 +56,7 @@ class GameScene extends Phaser.Scene {
       
 
     create() {
-  
+
         const map = this.make.tilemap({ key: "map" });
         const tileset = map.addTilesetImage("tileset6", "tiles");
       
@@ -157,35 +156,28 @@ class GameScene extends Phaser.Scene {
         .setDepth(30);
         
         var expand = true;
-        var accessibility = this.rexUI.add.buttons({
+        var pausebutton = this.rexUI.add.buttons({
             x: 1300, y: 40,
             width: 200,
             orientation: 'y',
 
             buttons: [
                 this.createButton(this, 'Pause'),
-                this.createButton(this, 'Play'),
-                this.createButton(this, 'End'),
-                this.createButton(this, 'Instructions')
             ],
 
             space: {
-                left: 10, right: 10, top: 180, bottom: 30, 
+                left: 10, right: 10, top: 40, bottom: 30, 
                 item: 3
             },
             expand: expand
         })
-            .layout().setScrollFactor(0).setDepth(30)
+        .layout().setScrollFactor(0).setDepth(30)
             // .drawBounds(this.add.graphics(), 0xff0000)
-
-        accessibility
+        var scene = this;
+        pausebutton
             .on('button.click', function (button, index, pointer, event) {
-              if(button.text === "Play") this.scene.resume("gameScene");
-              else if(button.text === "Pause") this.scene.scene.pause("gameScene");
-              else if(button.text === "End") this.scene.scene.start("homeScene");
-              else this.scene.scene.switch("titleScene");
+              this.scene.scene.start("menuScene");
             })
-
       }
 
       createButton (scene, text) {
@@ -347,9 +339,9 @@ class GameScene extends Phaser.Scene {
         }
         setValue(Bar, health);
       
-        if(health <= 0){
+        if(health <= 0.5){
           var toast = this.rexUI.add.toast({
-            x: 400,
+            x: 700,
             y: 300,
 
             background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
@@ -367,10 +359,13 @@ class GameScene extends Phaser.Scene {
               hold: 1000,
               out: 200
             }
-          }).show("Sorry You Lost the game! We hope you try again Bye Bye")
-          setTimeout(() => {
-            this.scene.start("homeScene");
-          }, 2000)
+          }).show("Sorry You Lost the game! We hope you try again Bye Bye");
+
+          if(health == 0.1){
+            this.data.menuScene = undefined;
+            this.data.gameScene = undefined;
+            this.scene.run("homeScene");
+          } 
         }
           
       }

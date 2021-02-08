@@ -1,8 +1,10 @@
+const { default: GameScene } = require("./gameScene");
+
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
-var content = `Phaser is a fast, free, and fun open source HTML5 game framework that offers WebGL and Canvas rendering across desktop and mobile web browsers. Games can be compiled to iOS, Android and native apps by using 3rd party tools. You can use JavaScript or TypeScript for development.`;
+var content = `The city is under danger and Misa(The character) wants to protect it by segregating garbage and doing the right thing with it. What is the right thing? Well to Know that you have to play the game. Note that your health is continuously decreasing so to collect health you have to dump the garbage.     After all waste in the game is dumped and you are still alive then congrats you have won the game!!!`;
 
 class TitleScene extends Phaser.Scene {
     constructor() {
@@ -22,22 +24,52 @@ class TitleScene extends Phaser.Scene {
     }
 
     create() {
-        createTextBox(this, 100, 100, {
-                wrapWidth: 500,
+        this.game.scene.stop("homeScene");
+        createTextBox(this, 300, 100, {
+                wrapWidth: 650,
             })
-            .start(content, 50);
+            .start(content, 70);
 
-        createTextBox(this, 100, 400, {
-                wrapWidth: 500,
-                fixedWidth: 500,
-                fixedHeight: 65,
+            var expand = true;
+            var button = this.rexUI.add.buttons({
+                x: 700, y: 400,
+                width: 200,
+                orientation: 'x',
+    
+                buttons: [
+                    this.createButton(this, 'Play/Resume Game'),
+                ],
+    
+                space: {
+                    left: 10, right: 10, top: 10, bottom: 10, 
+                    item: 3
+                },
+                expand: expand
             })
-            .start(content, 50);
+                .layout()
+                // .drawBounds(this.add.graphics(), 0xff0000)
+            var scene = this;
+            button
+                .on('button.click', function (button, index, pointer, event) {
+                    this.scene.scene.start("gameScene");
+                })
 
-        var text = this.add.text(500, 500, 'Welcome to my game!');
-        text.setInteractive({ useHandCursor: true });
-        text.on('pointerdown', () => this.clickButton());
+    }
 
+    createButton (scene, text) {
+        return scene.rexUI.add.label({
+            width: 40,
+            height: 40,
+            background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, COLOR_LIGHT),
+            text: scene.add.text(0, 0, text, {
+                fontSize: 18
+            }),
+            space: {
+                left: 10,
+                right: 10,
+            },
+            align: 'center'
+        });
     }
 
     clickButton() {
