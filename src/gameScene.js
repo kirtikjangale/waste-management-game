@@ -49,10 +49,21 @@ class GameScene extends Phaser.Scene {
           sceneKey: 'rexUI'
         });
         this.load.image('plastic', "./assets/images/recycle-plant.png");
-        this.load.image('garbage1', "./assets/images/garbage1.png");
-        this.load.image('garbage2', "./assets/images/garbage2.png");
-        this.load.image('garbage3', "./assets/images/garbage3.png");
-        this.load.image('garbage4', "./assets/images/garbage4.png");
+        this.load.image('cottonwaste',"./assets/images/cottonwaste.png")
+        this.load.image('plasticbottle',"./assets/images/plasticbottle.png")
+        this.load.image('siliconwaste',"./assets/images/siliconwaste.png")
+        this.load.image('glasscontainer',"./assets/images/glasscontainer.png")
+        this.load.image('aluminium',"./assets/images/aluminium.png")
+        this.load.image('kitchenwaste',"./assets/images/kitchenwaste.png")
+        this.load.image('batteries',"./assets/images/batteries.png")
+        this.load.image('wires',"./assets/images/wires.png")
+        this.load.image('cardboard',"./assets/images/cardboard.png")
+        this.load.image('organic',"./assets/images/organic.png")
+        this.load.image('ewaste1',"./assets/images/ewaste1.png")
+        this.load.image('ewaste2',"./assets/images/ewaste2.png")
+        this.load.image('foodwaste1',"./assets/images/foodwaste1.png")
+        this.load.image('foodwaste',"./assets/images/foodwaste.png")
+        this.load.image('softdrinks',"./assets/images/softdrinks.png")
       }
       
 
@@ -78,12 +89,12 @@ class GameScene extends Phaser.Scene {
           .setSize(30, 40)
           .setOffset(0, 24);
         this.physics.add.collider(player, worldLayer);
-        player.setCollideWorldBounds(true);
+       
 
         garbages = this.physics.add.staticGroup();
         garbageLayer.forEach(object => {
           var _id = 0;
-          let obj = garbages.create(object.x, object.y, "garbage4"); 
+          let obj = garbages.create(object.x, object.y, "garbage"); 
              obj.scaleX = 0.3;
              obj.scaleY = 0.3;
              obj.setOrigin(0); 
@@ -98,7 +109,7 @@ class GameScene extends Phaser.Scene {
             arr.forEach((obj) => {
               obj._id = _id;
               _id+=1;
-              obj.amt = 30;
+              obj.amt = getRandomInt(10,100);;
             });
             obj.garbageCont = arr;
         })
@@ -410,7 +421,6 @@ function makeBar(x, y,color,scene) {
   
   function hitGarbage(scene,obj) {
   
-   console.log('hit garbage() called')
   
     var data = {
       skills: obj.garbageCont
@@ -428,7 +438,7 @@ function makeBar(x, y,color,scene) {
       x: 1000,
       y: 300,
       width: 400,
-      height: 220,
+      height: 240,
   
       scrollMode: 1,
   
@@ -464,7 +474,7 @@ function makeBar(x, y,color,scene) {
         x: 400,
         y: 300,
         width: 400,
-        height: 220,
+        height: 280,
   
         scrollMode: 1,
   
@@ -472,9 +482,9 @@ function makeBar(x, y,color,scene) {
   
         panel: {
             child: createPanel(scene, data, "icon"),
-            mask: {
-                padding: 1
-            },
+            // mask: {
+            //     padding: 1
+            // },
         },
   
         slider: {
@@ -482,7 +492,7 @@ function makeBar(x, y,color,scene) {
             thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
         },
   
-        // scroller: true,
+        scroller: true,
   
         space: {
             left: 10,
@@ -508,19 +518,19 @@ function makeBar(x, y,color,scene) {
     if (!label) {
         return;
     }
-  
+    scene.input.setDraggable(label)
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
   
-          scene.input.setDraggable(label)
+          
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
               gameObject.x = dragX;
               gameObject.y = dragY;
-          
+              gameObject.setDepth(50);
           });
   
           scene.input.on('drop', function (pointer, gameObject, dropZone) {
-            // console.log(dropZone.name, label.getElement("icon").name);
+           
             console.log(obj.garbageCont);
             if(dropZone.name === label.getElement("icon").name){
               // console.log("in here 1");
