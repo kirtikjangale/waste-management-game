@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import createPanel from '../src/ui-elements/create-table'
-import {wastes, recycleFacts} from './store'
-import createLabel from './ui-elements/create-dump'
-import createAnims from './ui-elements/create-anims'
+import createPanel from '../ui-elements/create-table'
+import {wastes, recycleFacts} from '../store'
+import createLabel from '../ui-elements/create-dump'
+import createAnims from '../ui-elements/create-anims'
 
 let cursors;
 let player;
@@ -39,10 +39,10 @@ class GameScene extends Phaser.Scene {
 	preload() {
         this.load.image('preloaderBar', './assets/images/loading-bar.png');
         this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
-        this.load.tilemapTiledJSON("map", "./assets/tilemaps/map6.json");
+        this.load.tilemapTiledJSON("map", "./assets/tilemaps/map.json");
         this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
         this.load.image("garbage", "./assets/images/garbage1.png");
-        this.load.image("dumping", "./assets/images/dumping.png");
+        this.load.image("dumping", "./assets/images/dumping3.png");
         this.load.scenePlugin({
           key: 'rexuiplugin',
           url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
@@ -422,7 +422,6 @@ function makeBar(x, y,color,scene) {
   
   function setValue(bar, percentage) {
     //scale the bar
-    console.log("here baby");
     bar.scaleX = percentage/100;
   }
   
@@ -538,27 +537,23 @@ function makeBar(x, y,color,scene) {
   
           scene.input.on('drop', function (pointer, gameObject, dropZone) {
            
-            console.log(obj.garbageCont);
             if(dropZone.name === label.getElement("icon").name){
-              // console.log("in here 1");
+              
               health = Math.min(health+3,100);
               gameObject.x = dropZone.x;
               gameObject.y = dropZone.y;
               gameObject.scaleDownDestroy(100);
               const id = label.getElement("icon")._id;
-              console.log(id);
+              
               var amt = 0;
-              // console.log(label.getElement("icon").id);
+            
               obj.garbageCont = obj.garbageCont.filter((elem) => {
                 if(elem._id === id) amt = elem.amt;
                 return elem._id !== id;
               })
-              console.log(obj.garbageCont);
               gscore[dropZone.name] += amt;
-              console.log(gscore);
             }else{
               health -= 2;
-              // console.log("in here 2");
               gameObject.x = gameObject.input.dragStartX,
               gameObject.y = gameObject.input.dragStartY
             }
@@ -570,7 +565,6 @@ function makeBar(x, y,color,scene) {
           }
   
           var category = label.getParentSizer().name;
-          //console.log(`${category}:${label.text}\n`)
         });
     })
     
@@ -656,7 +650,6 @@ function makeBar(x, y,color,scene) {
               toast.show("Sorry! you don't have any waste to dump!");
             }else{
               var amt = Math.min(obj.capacity, gscore.biowaste);
-              console.log(toast);
               toast.displayTime = amt*100;
               toast.show(`Dumping ${amt} of biowaste please be patient...`);
               gscore.biowaste -= amt;
@@ -738,7 +731,6 @@ function makeBar(x, y,color,scene) {
       .on('button.click', function (button, groupName, index) {
         if(button.text === "Yes"){
   
-          console.log('jdsjakfhshzkdlkfgdzgdjkbkjhfhfsjlsr')
           var toast = scene.rexUI.add.toast({
             x: obj.x,
             y: obj.y,
