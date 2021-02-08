@@ -129,7 +129,8 @@ class GameScene extends Phaser.Scene {
         recyclePlants = this.physics.add.staticGroup();
         recycleLayer.forEach(object => {
           let obj = recyclePlants.create(object.x, object.y, "plastic");
-         
+          obj.scaleX=0.5;
+          obj.scaleY=0.5;
           obj.setOrigin(0);
           obj.body.width = object.width;
           obj.body.height = object.height;
