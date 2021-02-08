@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import TitleScene from './titleScene'
-import GameScene from './gameScene'
-import HomeScene from './homeScene'
-import MenuScene from './menuScene';
+import TitleScene from './scenes/titleScene'
+import GameScene from './scenes/gameScene'
+import HomeScene from './scenes/homeScene'
+import MenuScene from './scenes/menuScene';
 
 var gameScene = new GameScene();
 var titleScene = new TitleScene();
@@ -19,7 +19,6 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      debug: true,
       gravity: { y: 0 }
     }
   }
