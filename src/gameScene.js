@@ -3,7 +3,6 @@ import createPanel from '../src/ui-elements/create-table'
 import {wastes, recycleFacts} from './store'
 import createLabel from './ui-elements/create-dump'
 import createAnims from './ui-elements/create-anims'
-import TitleScene from './titleScene'
 
 let cursors;
 let player;
@@ -25,6 +24,7 @@ let recyclePlants;
 let dialogRecycle;
 let text1;
 let text2;
+let gameEnd=false;
 
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
@@ -68,7 +68,7 @@ class GameScene extends Phaser.Scene {
       
 
     create() {
-  
+
         const map = this.make.tilemap({ key: "map" });
         const tileset = map.addTilesetImage("tileset6", "tiles");
       
@@ -168,35 +168,30 @@ class GameScene extends Phaser.Scene {
         .setDepth(30);
         
         var expand = true;
-        var accessibility = this.rexUI.add.buttons({
+        var pausebutton = this.rexUI.add.buttons({
             x: 1300, y: 40,
             width: 200,
             orientation: 'y',
 
             buttons: [
                 this.createButton(this, 'Pause'),
-                this.createButton(this, 'Play'),
-                this.createButton(this, 'End'),
-                this.createButton(this, 'Instructions')
             ],
 
             space: {
-                left: 10, right: 10, top: 180, bottom: 30, 
+                left: 10, right: 10, top: 40, bottom: 30, 
                 item: 3
             },
             expand: expand
         })
-            .layout().setScrollFactor(0).setDepth(30)
+        .layout().setScrollFactor(0).setDepth(30)
             // .drawBounds(this.add.graphics(), 0xff0000)
-
-        accessibility
+        var scene = this;
+        pausebutton
             .on('button.click', function (button, index, pointer, event) {
-              if(button.text === "Play") this.scene.resume("gameScene");
-              else if(button.text === "Pause") this.scene.scene.pause("gameScene");
-              else if(button.text === "End") this.scene.scene.start("homeScene");
-              else this.scene.scene.switch("titleScene");
+              this.scene.scene.start("menuScene");
             })
 
+        
       }
 
       createButton (scene, text) {
@@ -217,6 +212,14 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+
+      if(gameEnd){
+        text2.setText(`health: 0`)
+        player.destroy(player.x,player.y);
+        location.reload();
+        return;
+      }
+
         const speed = 500;
         const prevVelocity = player.body.velocity.clone();
       
@@ -358,15 +361,17 @@ class GameScene extends Phaser.Scene {
         }
         setValue(Bar, health);
       
-        if(health <= 0){
+        if(health <= 0.5 && gameEnd==false){
+
+          gameEnd=true;
           var toast = this.rexUI.add.toast({
-            x: 400,
+            x: 700,
             y: 300,
 
-            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY).setScrollFactor(0).setDepth(30),
             text: this.add.text(0, 0, '', {
                 fontSize: '24px'
-            }),
+            }).setScrollFactor(0).setDepth(30),
             space: {
                 left: 20,
                 right: 20,
@@ -378,11 +383,13 @@ class GameScene extends Phaser.Scene {
               hold: 1000,
               out: 200
             }
-          }).show("Sorry You Lost the game! We hope you try again Bye Bye")
-          setTimeout(() => {
-            this.scene.start("homeScene");
-          }, 2000)
+          }).setScrollFactor(0).setDepth(30)
+          
+          toast.show("Sorry You Lost the game! We hope you try again Bye Bye");
+
+          
         }
+        
           
       }
 
@@ -534,7 +541,7 @@ function makeBar(x, y,color,scene) {
             console.log(obj.garbageCont);
             if(dropZone.name === label.getElement("icon").name){
               // console.log("in here 1");
-              health -= 1;
+              health = Math.min(health+3,100);
               gameObject.x = dropZone.x;
               gameObject.y = dropZone.y;
               gameObject.scaleDownDestroy(100);
