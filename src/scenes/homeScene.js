@@ -26,7 +26,7 @@ class HomeScene extends Phaser.Scene {
 	create() {
         var bg = this.add.sprite(400, 100, 'background');
         bg.setOrigin(0,0);
-        var text = this.add.text(600, 50, 'Swachch Bharat Abhiyan!');
+        var text = this.add.text(600, 50, 'Swachh Bharat Abhiyan!');
         
         var expand = true;
         var startbutton = this.rexUI.add.buttons({
