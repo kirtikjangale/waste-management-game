@@ -1,4 +1,6 @@
 import { Scene } from "phaser";
+import GameScene from "./gameScene";
+import TitleScene from './titleScene';
 
 const Random = Phaser.Math.Between;
 
@@ -44,8 +46,8 @@ class HomeScene extends Phaser.Scene {
         })
             .layout()
             // .drawBounds(this.add.graphics(), 0xff0000)
-
-        startbutton
+            var scene = this;
+            startbutton
             .on('button.click', function (button, index, pointer, event) {
                 this.scene.scene.start("gameScene");
             })
@@ -70,7 +72,7 @@ class HomeScene extends Phaser.Scene {
 
         instrbutton
             .on('button.click', function (button, index, pointer, event) {
-                this.scene.scene.start("titleScene")
+                this.scene.scene.start("titleScene");
             })
         
 	}

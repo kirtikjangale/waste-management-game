@@ -55,7 +55,7 @@ var createPanel = function (scene, data, type) {
     var capKey = key.charAt(0).toUpperCase() + key.slice(1);
     var title = scene.rexUI.add.label({
         orientation: 'x',
-        text: scene.add.text(0, 0, capKey),
+        text: type==="icon" ? scene.add.text(0, 0, 'Drag below images to drop zone'):scene.add.text(0, 0, 'Drop on appropriate category'),
     });
   
     var items = data[key];
@@ -111,7 +111,7 @@ var createPanel = function (scene, data, type) {
     if(type==="icon"){
       var label = scene.rexUI.add.label({
           orientation: 'y',
-          icon: scene.add.image(0,0,item.image).setScrollFactor(0).setDepth(30).setScale(0.3,0.4),
+          icon: scene.add.image(0,0,item.image).setScrollFactor(0).setDepth(40).setScale(0.3,0.4),
           text: scene.add.text(0, 0, item.name),
           space: { icon: 3 }
       }).setInteractive();
@@ -130,5 +130,4 @@ var createPanel = function (scene, data, type) {
   
     return label;
   };
-
   module.exports = createPanel

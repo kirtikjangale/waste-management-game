@@ -3,7 +3,6 @@ import createPanel from '../src/ui-elements/create-table'
 import {wastes, recycleFacts} from './store'
 import createLabel from './ui-elements/create-dump'
 import createAnims from './ui-elements/create-anims'
-import TitleScene from './titleScene'
 
 let cursors;
 let player;
@@ -25,6 +24,7 @@ let recyclePlants;
 let dialogRecycle;
 let text1;
 let text2;
+let gameEnd=false;
 
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
@@ -41,7 +41,7 @@ class GameScene extends Phaser.Scene {
         this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
         this.load.tilemapTiledJSON("map", "./assets/tilemaps/map6.json");
         this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
-        this.load.image("garbage", "./assets/images/garbage.png");
+        this.load.image("garbage", "./assets/images/garbage1.png");
         this.load.image("dumping", "./assets/images/dumping.png");
         this.load.scenePlugin({
           key: 'rexuiplugin',
@@ -49,15 +49,26 @@ class GameScene extends Phaser.Scene {
           sceneKey: 'rexUI'
         });
         this.load.image('plastic', "./assets/images/recycle-plant.png");
-        this.load.image('garbage1', "./assets/images/garbage1.png");
-        this.load.image('garbage2', "./assets/images/garbage2.png");
-        this.load.image('garbage3', "./assets/images/garbage3.png");
-        this.load.image('garbage4', "./assets/images/garbage4.png");
+        this.load.image('cottonwaste',"./assets/images/cottonwaste.png")
+        this.load.image('plasticbottle',"./assets/images/plasticbottle.png")
+        this.load.image('siliconwaste',"./assets/images/siliconwaste.png")
+        this.load.image('glasscontainer',"./assets/images/glasscontainer.png")
+        this.load.image('aluminium',"./assets/images/aluminium.png")
+        this.load.image('kitchenwaste',"./assets/images/kitchenwaste.png")
+        this.load.image('batteries',"./assets/images/batteries.png")
+        this.load.image('wires',"./assets/images/wires.png")
+        this.load.image('cardboard',"./assets/images/cardboard.png")
+        this.load.image('organic',"./assets/images/organic.png")
+        this.load.image('ewaste1',"./assets/images/ewaste1.png")
+        this.load.image('ewaste2',"./assets/images/ewaste2.png")
+        this.load.image('foodwaste1',"./assets/images/foodwaste1.png")
+        this.load.image('foodwaste',"./assets/images/foodwaste.png")
+        this.load.image('softdrinks',"./assets/images/softdrinks.png")
       }
       
 
     create() {
-  
+
         const map = this.make.tilemap({ key: "map" });
         const tileset = map.addTilesetImage("tileset6", "tiles");
       
@@ -78,12 +89,12 @@ class GameScene extends Phaser.Scene {
           .setSize(30, 40)
           .setOffset(0, 24);
         this.physics.add.collider(player, worldLayer);
-        player.setCollideWorldBounds(true);
+       
 
         garbages = this.physics.add.staticGroup();
         garbageLayer.forEach(object => {
           var _id = 0;
-          let obj = garbages.create(object.x, object.y, "garbage4"); 
+          let obj = garbages.create(object.x, object.y, "garbage"); 
              obj.scaleX = 0.3;
              obj.scaleY = 0.3;
              obj.setOrigin(0); 
@@ -98,7 +109,7 @@ class GameScene extends Phaser.Scene {
             arr.forEach((obj) => {
               obj._id = _id;
               _id+=1;
-              obj.amt = 30;
+              obj.amt = getRandomInt(10,100);;
             });
             obj.garbageCont = arr;
         })
@@ -112,7 +123,7 @@ class GameScene extends Phaser.Scene {
           obj.setOrigin(0);
           obj.body.width = object.width; 
           obj.body.height = object.height; 
-          obj.capacity = getRandomInt(30,60);
+          obj.capacity = getRandomInt(30,300);
         })
       
         recyclePlants = this.physics.add.staticGroup();
@@ -157,35 +168,30 @@ class GameScene extends Phaser.Scene {
         .setDepth(30);
         
         var expand = true;
-        var accessibility = this.rexUI.add.buttons({
+        var pausebutton = this.rexUI.add.buttons({
             x: 1300, y: 40,
             width: 200,
             orientation: 'y',
 
             buttons: [
                 this.createButton(this, 'Pause'),
-                this.createButton(this, 'Play'),
-                this.createButton(this, 'End'),
-                this.createButton(this, 'Instructions')
             ],
 
             space: {
-                left: 10, right: 10, top: 180, bottom: 30, 
+                left: 10, right: 10, top: 40, bottom: 30, 
                 item: 3
             },
             expand: expand
         })
-            .layout().setScrollFactor(0).setDepth(30)
+        .layout().setScrollFactor(0).setDepth(30)
             // .drawBounds(this.add.graphics(), 0xff0000)
-
-        accessibility
+        var scene = this;
+        pausebutton
             .on('button.click', function (button, index, pointer, event) {
-              if(button.text === "Play") this.scene.resume("gameScene");
-              else if(button.text === "Pause") this.scene.scene.pause("gameScene");
-              else if(button.text === "End") this.scene.scene.start("homeScene");
-              else this.scene.scene.switch("titleScene");
+              this.scene.scene.start("menuScene");
             })
 
+        
       }
 
       createButton (scene, text) {
@@ -206,6 +212,14 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+
+      if(gameEnd){
+        text2.setText(`health: 0`)
+        player.destroy(player.x,player.y);
+        location.reload();
+        return;
+      }
+
         const speed = 500;
         const prevVelocity = player.body.velocity.clone();
       
@@ -347,15 +361,17 @@ class GameScene extends Phaser.Scene {
         }
         setValue(Bar, health);
       
-        if(health <= 0){
+        if(health <= 0.5 && gameEnd==false){
+
+          gameEnd=true;
           var toast = this.rexUI.add.toast({
-            x: 400,
+            x: 700,
             y: 300,
 
-            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY),
+            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 20, COLOR_PRIMARY).setScrollFactor(0).setDepth(30),
             text: this.add.text(0, 0, '', {
                 fontSize: '24px'
-            }),
+            }).setScrollFactor(0).setDepth(30),
             space: {
                 left: 20,
                 right: 20,
@@ -367,11 +383,13 @@ class GameScene extends Phaser.Scene {
               hold: 1000,
               out: 200
             }
-          }).show("Sorry You Lost the game! We hope you try again Bye Bye")
-          setTimeout(() => {
-            this.scene.start("homeScene");
-          }, 2000)
+          }).setScrollFactor(0).setDepth(30)
+          
+          toast.show("Sorry You Lost the game! We hope you try again Bye Bye");
+
+          
         }
+        
           
       }
 
@@ -410,7 +428,6 @@ function makeBar(x, y,color,scene) {
   
   function hitGarbage(scene,obj) {
   
-   console.log('hit garbage() called')
   
     var data = {
       skills: obj.garbageCont
@@ -428,7 +445,7 @@ function makeBar(x, y,color,scene) {
       x: 1000,
       y: 300,
       width: 400,
-      height: 220,
+      height: 240,
   
       scrollMode: 1,
   
@@ -464,7 +481,7 @@ function makeBar(x, y,color,scene) {
         x: 400,
         y: 300,
         width: 400,
-        height: 220,
+        height: 280,
   
         scrollMode: 1,
   
@@ -472,9 +489,9 @@ function makeBar(x, y,color,scene) {
   
         panel: {
             child: createPanel(scene, data, "icon"),
-            mask: {
-                padding: 1
-            },
+            // mask: {
+            //     padding: 1
+            // },
         },
   
         slider: {
@@ -482,7 +499,7 @@ function makeBar(x, y,color,scene) {
             thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
         },
   
-        // scroller: true,
+        scroller: true,
   
         space: {
             left: 10,
@@ -508,23 +525,23 @@ function makeBar(x, y,color,scene) {
     if (!label) {
         return;
     }
-  
+    scene.input.setDraggable(label)
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
   
-          scene.input.setDraggable(label)
+          
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
               gameObject.x = dragX;
               gameObject.y = dragY;
-          
+              gameObject.setDepth(50);
           });
   
           scene.input.on('drop', function (pointer, gameObject, dropZone) {
-            // console.log(dropZone.name, label.getElement("icon").name);
+           
             console.log(obj.garbageCont);
             if(dropZone.name === label.getElement("icon").name){
               // console.log("in here 1");
-              health -= 1;
+              health = Math.min(health+3,100);
               gameObject.x = dropZone.x;
               gameObject.y = dropZone.y;
               gameObject.scaleDownDestroy(100);
@@ -644,7 +661,7 @@ function makeBar(x, y,color,scene) {
               toast.show(`Dumping ${amt} of biowaste please be patient...`);
               gscore.biowaste -= amt;
               obj.capacity -= amt;
-              health = min(health+5, 100);
+              health = Math.min(health+10, 100);
             }
           }
           dialogDump.scaleDownDestroy(100);
@@ -738,7 +755,7 @@ function makeBar(x, y,color,scene) {
             },
             duration: {
               in: 200,
-              hold: 3000+100*gscore.packaging,
+              hold: Math.min(3000+100*gscore.packaging,5000),
               out: 200
             }
           })
@@ -746,9 +763,9 @@ function makeBar(x, y,color,scene) {
             toast.show("Sorry! you don't have any waste to dump!");
           }else{
             health = Math.min(health+10, 100);
-            toast.show(`Dumping ${gscore.packaging+gscore.ewaste} amount of packaging waste please be patient...`);
+            toast.show(` ${gscore.packaging+gscore.ewaste} amount of packaging/ewaste is in the process of recycling please be patient...`);
             gscore.packaging = 0;
-            gscore.waste = 0;
+            gscore.ewaste = 0;
           }
         }
         dialogRecycle.scaleDownDestroy(100);

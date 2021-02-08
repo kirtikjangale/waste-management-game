@@ -2,10 +2,12 @@ import Phaser from 'phaser';
 import TitleScene from './titleScene'
 import GameScene from './gameScene'
 import HomeScene from './homeScene'
+import MenuScene from './menuScene';
 
 var gameScene = new GameScene();
 var titleScene = new TitleScene();
 var homeScene = new HomeScene();
+var menuScene = new MenuScene();
 
 //* Game scene */
 const config = {
@@ -29,6 +31,6 @@ var game = new Phaser.Game(config);
 game.scene.add('titleScene', titleScene);
 game.scene.add("gameScene", gameScene);
 game.scene.add("homeScene", homeScene);
+game.scene.add("menuScene", menuScene);
 // start title
 game.scene.start('homeScene');
-
