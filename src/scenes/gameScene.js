@@ -191,7 +191,7 @@ class GameScene extends Phaser.Scene {
               this.scene.scene.start("menuScene");
             })
 
-        
+           
       }
 
       createButton (scene, text) {
@@ -209,6 +209,10 @@ class GameScene extends Phaser.Scene {
             },
             align: 'center'
         }).setScrollFactor(0).setDepth(30);
+
+   
+
+
     }
 
     update(time, delta) {
@@ -525,49 +529,56 @@ function makeBar(x, y,color,scene) {
     if (!label) {
         return;
     }
-    scene.input.setDraggable(label)
+    
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
   
+         
+        });
           
-          scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-              gameObject.x = dragX;
-              gameObject.y = dragY;
-              gameObject.setDepth(50);
-          });
-  
-          scene.input.on('drop', function (pointer, gameObject, dropZone) {
-           
-            if(dropZone.name === label.getElement("icon").name){
-              
-              health = Math.min(health+3,100);
-              gameObject.x = dropZone.x;
-              gameObject.y = dropZone.y;
-              gameObject.scaleDownDestroy(100);
-              const id = label.getElement("icon")._id;
-              
-              var amt = 0;
-            
-              obj.garbageCont = obj.garbageCont.filter((elem) => {
-                if(elem._id === id) amt = elem.amt;
-                return elem._id !== id;
-              })
-              gscore[dropZone.name] += amt;
-            }else{
-              health -= 2;
-              gameObject.x = gameObject.input.dragStartX,
-              gameObject.y = gameObject.input.dragStartY
-            }
-  
-          });
+          scene.input.setDraggable(label)
+          
   
           if (!label.getTopmostSizer().isInTouching()) {
               return;
           }
   
           var category = label.getParentSizer().name;
-        });
+          
     })
+    scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+      gameObject.x = dragX;
+      gameObject.y = dragY;
+      gameObject.setDepth(50);
+  });
+
+  scene.input.on('drop', function (pointer, gameObject, dropZone) {
+    
+    if(dropZone.name === gameObject.getElement("icon").name){
+      console.log('deleted from here')
+      
+      health = Math.min(health+3,100);
+      gameObject.x = dropZone.x;
+      gameObject.y = dropZone.y;
+      gameObject.scaleDownDestroy(0);
+      const id = gameObject.getElement("icon")._id;
+      
+      var amt = 0;
+    
+      obj.garbageCont = obj.garbageCont.filter((elem) => {
+        if(elem._id === id) amt = elem.amt;
+        return elem._id !== id;
+      })
+      gscore[dropZone.name] += amt;
+    }else{
+      health -= 2;
+      gameObject.x = gameObject.input.dragStartX,
+      gameObject.y = gameObject.input.dragStartY
+    }
+
+  });
+
+    
     
   }
   
