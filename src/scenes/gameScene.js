@@ -26,6 +26,8 @@ let text1;
 let text2;
 let gameEnd=false;
 
+let sounds={};
+
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
@@ -38,6 +40,7 @@ class GameScene extends Phaser.Scene {
 
 	preload() {
         this.load.image('preloaderBar', './assets/images/loading-bar.png');
+
         this.load.image("tiles", "./assets/tilesets/tuxmon-sample-32px-extruded.png");
         this.load.tilemapTiledJSON("map", "./assets/tilemaps/map.json");
         this.load.atlas("atlas", "./assets/atlas/atlas.png", "../assets/atlas/atlas.json");
@@ -64,6 +67,10 @@ class GameScene extends Phaser.Scene {
         this.load.image('foodwaste1',"./assets/images/foodwaste1.png")
         this.load.image('foodwaste',"./assets/images/foodwaste.png")
         this.load.image('softdrinks',"./assets/images/softdrinks.png")
+        this.load.audio('sword', "./assets/SoundEffects/sword.mp3");
+        this.load.audio('escape', "./assets/SoundEffects/escape.wav");
+        this.load.audio('alien', "./assets/SoundEffects/alien.wav");
+        this.load.audio('blaster', "./assets/SoundEffects/blaster.mp3");
       }
       
 
@@ -90,6 +97,38 @@ class GameScene extends Phaser.Scene {
           .setOffset(0, 24);
         this.physics.add.collider(player, worldLayer);
        
+
+       //sounds
+       sounds.swordSound = this.sound.add('sword', {
+        mute: false,
+        volume: 0.1,
+        rate: 1,
+        loop: false,
+        delay:200
+      });
+      sounds.escapeSound = this.sound.add('escape', {
+        mute: false,
+        volume: 0.1,
+        rate: 1,
+        loop: false,
+        delay:200
+      });
+      sounds.alienSound = this.sound.add('alien', {
+        mute: false,
+        volume: 0.1,
+        rate: 1,
+        loop: false,
+        delay:200
+      });
+      sounds.blasterSound = this.sound.add('blaster', {
+        mute: false,
+        volume: 0.1,
+        rate: 1,
+        loop: false,
+        delay:200
+      });
+     
+     
 
         garbages = this.physics.add.staticGroup();
         garbageLayer.forEach(object => {
@@ -216,6 +255,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+
+      
 
       health -= 0.01;
       if(gameEnd){
@@ -432,7 +473,7 @@ function makeBar(x, y,color,scene) {
   
   function hitGarbage(scene,obj) {
   
-  
+    sounds.alienSound.play();
     var data = {
       skills: obj.garbageCont
     };
@@ -556,7 +597,7 @@ function makeBar(x, y,color,scene) {
     
     if(dropZone.name === gameObject.getElement("icon").name){
       console.log('deleted from here')
-      
+      sounds.swordSound.play();
       health = Math.min(health+3,100);
       gameObject.x = dropZone.x;
       gameObject.y = dropZone.y;
@@ -571,6 +612,7 @@ function makeBar(x, y,color,scene) {
       })
       gscore[dropZone.name] += amt;
     }else{
+      sounds.blasterSound.play();
       health -= 2;
       gameObject.x = gameObject.input.dragStartX,
       gameObject.y = gameObject.input.dragStartY
@@ -583,6 +625,8 @@ function makeBar(x, y,color,scene) {
   }
   
   function hitDump(scene, obj){
+
+    sounds.alienSound.play();
     dialogDump = scene.rexUI.add.dialog({
         x: obj.x,
         y: obj.y,
@@ -660,9 +704,12 @@ function makeBar(x, y,color,scene) {
             })
             if(gscore.biowaste === 0){
               toast.show("Sorry! you don't have any waste to dump!");
+              sounds.blasterSound.play();
             }else{
+             
+              sounds.escapeSound.play();
               var amt = Math.min(obj.capacity, gscore.biowaste);
-              toast.displayTime = amt*100;
+              toast.displayTime = Math.min(amt*100,5000);
               toast.show(`Dumping ${amt} of biowaste please be patient...`);
               gscore.biowaste -= amt;
               obj.capacity -= amt;
@@ -687,6 +734,7 @@ function makeBar(x, y,color,scene) {
   
   function hitRecycle(scene, recycleFacts, obj){
     
+    sounds.alienSound.play();
     dialogRecycle = scene.rexUI.add.dialog({
       x: obj.x,
       y: obj.y,
@@ -743,6 +791,7 @@ function makeBar(x, y,color,scene) {
       .on('button.click', function (button, groupName, index) {
         if(button.text === "Yes"){
   
+          
           var toast = scene.rexUI.add.toast({
             x: obj.x,
             y: obj.y,
@@ -765,7 +814,9 @@ function makeBar(x, y,color,scene) {
           })
           if(gscore.packaging+gscore.ewaste === 0){
             toast.show("Sorry! you don't have any waste to dump!");
+            sounds.blasterSound.play();
           }else{
+            sounds.escapeSound.play();
             health = Math.min(health+10, 100);
             toast.show(` ${gscore.packaging+gscore.ewaste} amount of packaging/ewaste is in the process of recycling please be patient...`);
             gscore.packaging = 0;

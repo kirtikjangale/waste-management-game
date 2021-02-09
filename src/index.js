@@ -21,7 +21,11 @@ const config = {
     arcade: {
       gravity: { y: 0 }
     }
-  }
+  },
+  audio: {
+    disableWebAudio: false
+}
+
 };
 
 var game = new Phaser.Game(config);
