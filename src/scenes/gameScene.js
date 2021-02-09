@@ -71,6 +71,7 @@ class GameScene extends Phaser.Scene {
         this.load.audio('escape', "./assets/SoundEffects/escape.wav");
         this.load.audio('alien', "./assets/SoundEffects/alien.wav");
         this.load.audio('blaster', "./assets/SoundEffects/blaster.mp3");
+        this.load.audio('gamesound', "./assets/SoundEffects/gamesound.mp3");
       }
       
 
@@ -127,8 +128,15 @@ class GameScene extends Phaser.Scene {
         loop: false,
         delay:200
       });
+      sounds.gameSound = this.sound.add('gamesound', {
+        mute: false,
+        volume: 0.1,
+        rate: 1,
+        loop: true,
+        delay:200
+      });
      
-     
+      sounds.gameSound.play();
 
         garbages = this.physics.add.staticGroup();
         garbageLayer.forEach(object => {
@@ -227,6 +235,7 @@ class GameScene extends Phaser.Scene {
         var scene = this;
         pausebutton
             .on('button.click', function (button, index, pointer, event) {
+              sounds.gameSound.stop();
               this.scene.scene.start("menuScene");
             })
 
