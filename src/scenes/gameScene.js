@@ -580,14 +580,13 @@ function makeBar(x, y,color,scene) {
         return;
     }
     
+    scene.input.setDraggable(label)
+
     var click = scene.rexUI.add.click(label.getElement('icon'), { threshold: 10 })
         .on('click', function () {
   
          
-        });
-          
-          scene.input.setDraggable(label)
-          
+        });      
   
           if (!label.getTopmostSizer().isInTouching()) {
               return;
