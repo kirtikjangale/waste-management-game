@@ -513,11 +513,6 @@ function makeBar(x, y,color,scene) {
           },
       },
   
-      slider: {
-          track: scene.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-          thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
-      },
-  
       scroller: false,
   
       space: {
