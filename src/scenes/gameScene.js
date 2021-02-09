@@ -498,7 +498,7 @@ function makeBar(x, y,color,scene) {
     dropzonepanel = scene.rexUI.add.scrollablePanel({
       x: 1000,
       y: 300,
-      width: 400,
+      width: 310,
       height: 240,
   
       scrollMode: 1,
@@ -518,7 +518,7 @@ function makeBar(x, y,color,scene) {
           thumb: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
       },
   
-      scroller: true,
+      scroller: false,
   
       space: {
           left: 10,
@@ -595,11 +595,13 @@ function makeBar(x, y,color,scene) {
           var category = label.getParentSizer().name;
           
     })
+
     scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
       gameObject.x = dragX;
       gameObject.y = dragY;
       gameObject.setDepth(50);
-  });
+      // console.log(pointer.isDown);
+    });
 
   scene.input.on('drop', function (pointer, gameObject, dropZone) {
     
