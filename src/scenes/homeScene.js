@@ -8,6 +8,9 @@ const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
+let sounds={};
+
+
 class HomeScene extends Phaser.Scene {
 
 	constructor() {
@@ -20,13 +23,28 @@ class HomeScene extends Phaser.Scene {
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
             sceneKey: 'rexUI'
           });
-		this.load.image('background', './assets/images/map6.png');
+        this.load.image('background', './assets/images/map6.png');
+        this.load.audio('govtsong', "./assets/SoundEffects/swachhbharatsong.mp3");
+        
 	}
+
 
 	create() {
         var bg = this.add.sprite(400, 100, 'background');
         bg.setOrigin(0,0);
         var text = this.add.text(600, 50, 'Swachh Bharat Abhiyan!');
+        
+        
+        
+        sounds.govtsong = this.sound.add('govtsong', {
+            mute: false,
+            volume: 0.1,
+            rate: 1,
+            loop: true,
+            delay:200
+          });
+
+        sounds.govtsong.play();
         
         var expand = true;
         var startbutton = this.rexUI.add.buttons({
@@ -49,6 +67,7 @@ class HomeScene extends Phaser.Scene {
             var scene = this;
             startbutton
             .on('button.click', function (button, index, pointer, event) {
+                sounds.govtsong.stop();
                 this.scene.scene.start("gameScene");
             })
 
@@ -72,6 +91,7 @@ class HomeScene extends Phaser.Scene {
 
         instrbutton
             .on('button.click', function (button, index, pointer, event) {
+                sounds.govtsong.stop();
                 this.scene.scene.start("titleScene");
             })
         
@@ -94,6 +114,8 @@ class HomeScene extends Phaser.Scene {
     }
 
 }
+
+
 
 export default HomeScene;
 

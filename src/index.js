@@ -23,12 +23,14 @@ const config = {
     }
   },
   audio: {
-    disableWebAudio: false
+    disableWebAudio: false,
+    
 }
 
 };
 
 var game = new Phaser.Game(config);
+
 
 // load scenes
 game.scene.add('titleScene', titleScene);

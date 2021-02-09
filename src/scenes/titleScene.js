@@ -3,7 +3,7 @@ const { default: GameScene } = require("./gameScene");
 const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
-
+let sounds={}
 var content = `The city is under danger and Misa(The character) wants to protect it by segregating garbage and doing the right thing with it. What is the right thing? Well to Know that you have to play the game. Note that your health is continuously decreasing so to collect health you have to dump the garbage.     After all waste in the game is dumped and you are still alive then congrats you have won the game!!!`;
 
 class TitleScene extends Phaser.Scene {
@@ -21,10 +21,22 @@ class TitleScene extends Phaser.Scene {
         });
  
         this.load.image('nextPage', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow-down-left.png');
+        this.load.audio('gadiwala', "./assets/SoundEffects/gadiwala.mp3");
     }
 
     create() {
         this.game.scene.stop("homeScene");
+
+        sounds.gadiwala = this.sound.add('gadiwala', {
+            mute: false,
+            volume: 0.1,
+            rate: 1,
+            loop: true,
+            delay:200
+          });
+
+        sounds.gadiwala.play();
+
         createTextBox(this, 300, 100, {
                 wrapWidth: 650,
             })
@@ -51,6 +63,7 @@ class TitleScene extends Phaser.Scene {
             var scene = this;
             button
                 .on('button.click', function (button, index, pointer, event) {
+                    sounds.gadiwala.stop();
                     this.scene.scene.start("gameScene");
                 })
 

@@ -4,6 +4,8 @@ const COLOR_PRIMARY = 0x4e342e;
 const COLOR_LIGHT = 0x7b5e57;
 const COLOR_DARK = 0x260e04;
 
+let sounds={}
+
 class MenuScene extends Phaser.Scene {
     constructor() {
         super({
@@ -19,9 +21,21 @@ class MenuScene extends Phaser.Scene {
         });
  
         this.load.image('nextPage', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow-down-left.png');
+        this.load.audio('govtsong', "./assets/SoundEffects/swachhbharatsong.mp3");
     }
 
     create() {
+
+        sounds.govtsong = this.sound.add('govtsong', {
+            mute: false,
+            volume: 0.1,
+            rate: 1,
+            loop: true,
+            delay:200
+          });
+
+        sounds.govtsong.play();
+
         var expand = true;
         var accessibility = this.rexUI.add.buttons({
             x: 700, y: 300,
@@ -47,12 +61,15 @@ class MenuScene extends Phaser.Scene {
         accessibility
             .on('button.click', function (button, index, pointer, event) {
               if(button.text === "Play"){
+                sounds.govtsong.stop();
                     this.scene.scene.start("gameScene");
               } 
               else if(button.text === "End"){
+                sounds.govtsong.stop();
                     location.reload();
               }
               else{
+                sounds.govtsong.stop();
                 this.scene.scene.start("titleScene");
               } 
             })
