@@ -266,8 +266,8 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
 
       
-
       health -= 0.01;
+      
       if(gameEnd){
         text2.setText(`health: 0`)
         player.destroy(player.x,player.y);
@@ -299,19 +299,19 @@ class GameScene extends Phaser.Scene {
       
         // Update the animation last and give left/right animations precedence over up/down animations
         if (cursors.left.isDown) {
-         
+          health -= 0.01;    
           player.anims.play("misa-left-walk", true);
         } else if (cursors.right.isDown) {
-         
+          health -= 0.01;
           player.anims.play("misa-right-walk", true);
         } else if (cursors.up.isDown) {
-         
+          health -= 0.01;
           player.anims.play("misa-back-walk", true);
         } else if (cursors.down.isDown) {
-          
+          health -= 0.01;
           player.anims.play("misa-front-walk", true);
         } else {
-          
+          health -= 0.01;
           player.anims.stop();
       
           // If we were moving, pick and idle frame to use
